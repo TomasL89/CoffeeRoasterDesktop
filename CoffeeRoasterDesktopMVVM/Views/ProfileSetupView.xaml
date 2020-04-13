@@ -8,7 +8,7 @@
              xmlns:vm="clr-namespace:CoffeeRoasterDesktopUI.ViewModels"
              xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" MinHeight="1080" MinWidth="1920">
+             d:DesignHeight="450" d:DesignWidth="800" MinHeight="1080" MinWidth="1920" Background="Black">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height=".07*" x:Name="toolBarRow"/>
@@ -68,8 +68,7 @@
             <ItemsControl.Resources>
                 <DataTemplate DataType="{x:Type vm:RoastPointButton}">
                     <ContentControl>
-                        <!--todo fix the command-->
-                        <Button Background="White" BorderBrush="White" Margin="5" x:Name="holderContainer" Command="{Binding DataContext.AddNewRoastPointCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+                        <Button Background="Black" BorderBrush="Black" Margin="5" x:Name="holderContainer" Command="{Binding DataContext.AddNewRoastPointCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
                             <Button.Content>
                                 <Grid>
                                     <Rectangle Width="200" Height="180" RadiusX="15" RadiusY="15" Fill="LightGray" StrokeThickness="4" Stroke="DarkSlateGray" StrokeDashArray="2 2"/>
