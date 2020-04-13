@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+obj/
+bin/
+/.vs
+/CoffeeRoasterDesktopBackgroundLibrary/obj/
+/CoffeeRoasterDesktopBackgroundLibrary/bin/
+/CoffeeRoasterDesktopBackground/obj/
+/CoffeeRoasterDesktopBackground/bin/
+/CoffeeRoasterDesktopMVVM/obj
+/CoffeeRoasterDesktopMVVM/bin/
+/CoffeeRoasterDesktopMVVM/.vs/
+/CoffeeRoasterDesktopMVVM/bin/
+/CoffeeRoasterDesktopBackground/bin/
