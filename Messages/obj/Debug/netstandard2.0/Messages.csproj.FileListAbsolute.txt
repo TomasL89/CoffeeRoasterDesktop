@@ -1,0 +1,9 @@
+C:\Users\Tomas\source\repos\Messages\bin\Debug\netstandard2.0\Messages.deps.json
+C:\Users\Tomas\source\repos\Messages\bin\Debug\netstandard2.0\Messages.dll
+C:\Users\Tomas\source\repos\Messages\bin\Debug\netstandard2.0\Messages.pdb
+C:\Users\Tomas\source\repos\Messages\obj\Debug\netstandard2.0\Messages.csprojAssemblyReference.cache
+C:\Users\Tomas\source\repos\Messages\obj\Debug\netstandard2.0\Messages.csproj.CoreCompileInputs.cache
+C:\Users\Tomas\source\repos\Messages\obj\Debug\netstandard2.0\Messages.AssemblyInfoInputs.cache
+C:\Users\Tomas\source\repos\Messages\obj\Debug\netstandard2.0\Messages.AssemblyInfo.cs
+C:\Users\Tomas\source\repos\Messages\obj\Debug\netstandard2.0\Messages.dll
+C:\Users\Tomas\source\repos\Messages\obj\Debug\netstandard2.0\Messages.pdb
