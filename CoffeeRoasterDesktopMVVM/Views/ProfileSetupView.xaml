@@ -11,7 +11,7 @@
              d:DesignHeight="450" d:DesignWidth="800" MinHeight="1080" MinWidth="1920" Background="Black">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height=".07*" x:Name="toolBarRow"/>
+            <RowDefinition Height=".1*" x:Name="toolBarRow"/>
             <RowDefinition Height="{Binding DropDownHeight}" x:Name="profileSettingsDropDownRow"/>
             <RowDefinition Height="*" x:Name="roastProfilePlotRow"/>
             <RowDefinition Height=".3*" x:Name="roastProfilePointRow"/>
@@ -19,14 +19,14 @@
 
         <StackPanel Grid.Row="0" Margin="30,5,30,0">
             <StackPanel Orientation="Horizontal" >
-                <Button Width="32" Height="32" BorderThickness="0" Background="White" Margin="0,0,10,0" Command="{Binding SaveRoastProfileCommand}">
-                    <Image Source="/Resources/save-icon (Those-Icons).png"/>
+                <Button Width="32" Height="32" BorderThickness="0" Background="Black" Margin="0,0,10,0" Command="{Binding ConfigureProfileCommand}">
+                    <Image Source="/Resources/add new dark theme.png"/>
                 </Button>
-                <Button Width="32" Height="32" BorderThickness="0" Background="White" Margin="0,0,10,0" Command="{Binding LoadRoastProfileCommand}">
-                    <Image Source="/Resources/folder (Freepik).png"/>
+                <Button Width="32" Height="32" BorderThickness="0" Background="Black" Margin="0,0,10,0" Command="{Binding SaveRoastProfileCommand}">
+                    <Image Source="/Resources/save-icon (Those-Icons) dark theme.png"/>
                 </Button>
-                <Button Width="32" Height="32" BorderThickness="0" Background="White" Margin="0,0,10,0" Command="{Binding ConfigureProfileCommand}">
-                    <Image Source="/Resources/settings (Good Ware).png"/>
+                <Button Width="32" Height="32" BorderThickness="0" Background="Black" Margin="0,0,10,0" Command="{Binding LoadRoastProfileCommand}">
+                    <Image Source="/Resources/folder (Freepik) dark theme.png"/>
                 </Button>
                 <!--<Button Width="32" Height="32" BorderThickness="0" Background="White" Margin="0,0,10,0">
                     <Image Source="/Resources/upload (Those Icons).png"/>
@@ -53,13 +53,21 @@
                 <TextBox x:Name="roastMinTemperatureSetting" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="40" Margin="0,0,10,0"/>
                 <TextBlock Text="° C" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
             </StackPanel>
+            <!--<StackPanel Orientation="Horizontal">
+                <Label Content="Min Temperature" FontWeight="Bold" Width="120" Foreground="White"/>
+                <ComboBox ItemsSource="{Binding PhaseColours}"
+                          SelectedItem="{Binding SelectedPhaseColour}"
+                          Width="50">
+                            
+                </ComboBox>
+            </StackPanel>-->
         </StackPanel>
 
         <UserControl Grid.Row="2">
             <ScottPlot:WpfPlot Content="{Binding RoastProfilePlot}"></ScottPlot:WpfPlot>
         </UserControl>
 
-        <ItemsControl ItemsSource="{Binding RoastPointItems}" Grid.Row="3" >
+        <ItemsControl ItemsSource="{Binding RoastPointItems}" Grid.Row="3">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal"/>

@@ -26,6 +26,8 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public int RoastTemperatureMax { get; set; } = DefaultMaxTemperature;
         public int RoastTemperatureMin { get; set; } = DefaultMinTemperature;
         public ObservableCollection<RoastProfilePointBase> RoastPointItems { get; set; } = new ObservableCollection<RoastProfilePointBase>();
+        public List<SolidColorBrush> PhaseColours { get; set; } = new List<SolidColorBrush>();
+        public SolidColorBrush SelectedPhaseColour { get; set; }
         public string Name { get; set; } = "Profile Setup";
         public RoastProfile RoastProfile { get; private set; }
         public ICommand AddNewRoastPointCommand { get; }
@@ -78,6 +80,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             colors.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFB9F")));
             colors.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD6A8")));
             colors.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D2C7FF")));
+            PhaseColours.AddRange(colors);
         }
 
         private void ConfigureProfile()
@@ -192,7 +195,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
             var roastPointItem = new RoastPointItem()
             {
-                Color = colors[roastPointCounter],
+                Colour = colors[roastPointCounter],
                 RoastPoint = roastPoint
             };
 
