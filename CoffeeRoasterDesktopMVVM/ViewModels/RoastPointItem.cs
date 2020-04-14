@@ -17,9 +17,6 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnRoastPointChanged()
-        {
-            Console.WriteLine("Changed");
-        }
+        
     }
 }

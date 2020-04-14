@@ -19,7 +19,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         const int DefaultTimeInSeconds = 900;
         const int DefaultMaxTemperature = 250;
         const int DefaultMinTemperature = 30;
+        const int DefaultDropDownHeight = 100;
 
+        public int DropDownHeight { get; set; }
         public int RoastTimeInSeconds { get; set; } = DefaultTimeInSeconds;
         public int RoastTemperatureMax { get; set; } = DefaultMaxTemperature;
         public int RoastTemperatureMin { get; set; } = DefaultMinTemperature;
@@ -27,6 +29,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public string Name { get; set; } = "Profile Setup";
         public RoastProfile RoastProfile { get; private set; }
         public ICommand AddNewRoastPointCommand { get; }
+        public ICommand SaveRoastProfileCommand { get; }
+        public ICommand LoadRoastProfileCommand { get; }
+        public ICommand ConfigureProfileCommand { get; }
         public WpfPlot RoastProfilePlot { get; set; }
 
 
@@ -39,16 +44,15 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         public ProfileSetupViewModel()
         {
-            //var plot = new Plot();
-            //RoastProfilePlot = new WpfPlot(plot);
             RoastProfilePlot = new WpfPlot();
             RoastProfilePlot.plt.Axis(x1: 0, x2: RoastTimeInSeconds, y1: RoastTemperatureMin, y2: RoastTemperatureMax);
-            //RoastProfilePlot.plt.Style(dataBg: System.Drawing.Color.FromArgb(0, 0, 0));
-            //RoastProfilePlot.plt.Style(dataBg: System.Drawing.Color.FromArgb(0, 0, 0));
-            RoastProfilePlot.plt.Style(ScottPlot.Style.Blue3);
+            RoastProfilePlot.plt.Style(Style.Blue3);
             RoastProfile = new RoastProfile();
             RoastPointItems.Add(new RoastPointButton());
             AddNewRoastPointCommand = new DelegateCommand(AddNewRoastPoint);
+            SaveRoastProfileCommand = new DelegateCommand(SaveRoastProfile);
+            LoadRoastProfileCommand = new DelegateCommand(LoadRoastProfile);
+            ConfigureProfileCommand = new DelegateCommand(ConfigureProfile);
             //colors.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc693")));
             //colors.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8eb08a")));
             //colors.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#659784")));
@@ -76,6 +80,21 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             colors.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D2C7FF")));
         }
 
+        private void ConfigureProfile()
+        {
+
+            DropDownHeight = DropDownHeight > 0 ? 0 : DefaultDropDownHeight;
+        }
+
+        private void LoadRoastProfile()
+        {
+            // todo implement RoastProfile Manager
+        }
+
+        private void SaveRoastProfile()
+        {
+            // todo implement RoastProfile Manager
+        }
 
         private void RoastPointItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -130,7 +149,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             RoastProfilePlot.plt.PlotScatter(xS, yS);
             //RoastProfilePlot.plt.Style(dataBg: System.Drawing.Color.FromArgb(0, 0, 0));
             //RoastProfilePlot.plt.Style(dataBg: System.Drawing.Color.FromArgb(0, 0, 0));
-            RoastProfilePlot.plt.Style(ScottPlot.Style.Blue3);
+            RoastProfilePlot.plt.Style(Style.Blue3);
             // todo refactor when everything is working
             for (var i = 0; i < roastPoints.Count; i++)
             {
@@ -140,7 +159,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
                 var roastPointColor = System.Drawing.Color.FromArgb(brushColor.Color.A, brushColor.Color.R, brushColor.Color.G, brushColor.Color.B);
                 RoastProfilePlot.plt.PlotHSpan(roastPoints[i].StartSeconds, roastPoints[i].EndSeconds, roastPointColor);
                 // this calculation needs to be a little better with accounting for the text length
-                RoastProfilePlot.plt.PlotText(roastPoint.StageName, ((roastPoints[i].StartSeconds + roastPoints[i].EndSeconds)/2), 250);
+                RoastProfilePlot.plt.PlotText(roastPoint.StageName, ((roastPoints[i].StartSeconds + roastPoints[i].EndSeconds)/2), 250, System.Drawing.Color.White, fontName:null, 16);
 
             }
             // todo fix this so it doesn't throw anything
