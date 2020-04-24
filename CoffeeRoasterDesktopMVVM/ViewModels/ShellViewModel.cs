@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using CoffeeRoasterDesktopBackgroundLibrary;
 using CoffeeRoasterDesktopUI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -12,14 +13,17 @@ namespace CoffeeRoasterDesktopMVVM.ViewModels
     public class ShellViewModel : Conductor<object>
     {
 		public ObservableCollection<ITabViewModel> Tabs { get; private set; }
+		private readonly RoasterConnection roasterConnection;
 
 		public ShellViewModel()
 		{
+			roasterConnection = new RoasterConnection();
+
 			Tabs = new ObservableCollection<ITabViewModel>
 			{
-				new RoastViewModel(),
-				new ProfileSetupViewModel(),
-				new SystemSettingsViewModel()
+				new RoastViewModel(roasterConnection),
+				new ProfileSetupViewModel(roasterConnection),
+				new SystemSettingsViewModel(roasterConnection)
 			};
 		}
 

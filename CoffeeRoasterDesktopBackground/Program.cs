@@ -1,38 +1,41 @@
-﻿using Messages;
+﻿using CoffeeRoasterDesktopBackground;
+using CoffeeRoasterDesktopBackgroundLibrary;
+using Messages;
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace CoffeeRoasterDesktopBackground
+namespace CoffeeRoasterDesktopCLI
 {
     // for testing only
     public class Program
     {
-        private static WiFiManager wifiManager;
-        static void Main(string[] args)
+        private static RoasterConnection roasterConnection;
+        static async Task Main(string[] args)
         {
            
             IDisposable disposable;
             // setup all processes
             var configurationService = new ConfigurationService();
             // todo testing only, shouldn't be able to set IpAddress like this
-            configurationService.SystemConfiguration.IpAddress = "192.168.1.104";
-            wifiManager = new WiFiManager(configurationService.SystemConfiguration);
+            roasterConnection = new RoasterConnection();
+            //await roasterConnection.UpdateConfigurationAsync("192.168.1.109", 8180);
 
+            roasterConnection.UpdateConfiguration("192.168.1.109", 8180);
+            Console.WriteLine($"Attempting connection on 192.168.1.109: {8180}");
+            roasterConnection.ConnectToDevice();
             disposable = new CompositeDisposable
             {
-                wifiManager.WiFiConnected.Subscribe(x => displayMessage(x)),
-                MessageHandler.MessageRecieved.Subscribe(x => displayMessage(x))
+                roasterConnection.WiFiConnected.Subscribe(x => displayMessage(x)),
+                roasterConnection.MessageRecieved.Subscribe(x => displayMessage(x))
             };
-
-            var timer = new System.Timers.Timer(TimeSpan.FromSeconds(2).TotalSeconds);
-            timer.AutoReset = true;
-            timer.Elapsed += GetTemperatureMessage;
-            timer.Start();
-
+            Console.WriteLine("Connected");
+            //var timer = new System.Timers.Timer();
+            //timer.AutoReset = true;
+            //timer.Interval = 5000;
+            //timer.Elapsed += GetTemperatureMessage;
+            //timer.Enabled = true;
 
             Console.WriteLine("Running");
             while (true)
@@ -40,7 +43,7 @@ namespace CoffeeRoasterDesktopBackground
                 var inputMessage = Console.ReadLine();
                 if (string.Equals(inputMessage, "quit", StringComparison.InvariantCultureIgnoreCase))
                     break;
-                wifiManager.SendMessageToDevice("get");
+                roasterConnection.SendMessageToDevice("get");
 
             }
             Console.WriteLine("Closing Application");
@@ -49,7 +52,7 @@ namespace CoffeeRoasterDesktopBackground
 
         private static void GetTemperatureMessage(Object source, System.Timers.ElapsedEventArgs e)
         {
-            wifiManager.SendMessageToDevice("get");
+            roasterConnection.SendMessageToDevice("get");
         }
 
         private static void displayMessage(object message)

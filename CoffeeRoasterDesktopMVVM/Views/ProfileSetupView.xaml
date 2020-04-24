@@ -6,18 +6,31 @@
              xmlns:local="clr-namespace:CoffeeRoasterDesktopUI.Views" 
              xmlns:ScottPlot="clr-namespace:ScottPlot;assembly=ScottPlot.WPF"
              xmlns:vm="clr-namespace:CoffeeRoasterDesktopUI.ViewModels"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" MinHeight="1080" MinWidth="1920" Background="Black">
+             d:DesignHeight="450" d:DesignWidth="1920" MinHeight="1080" MinWidth="1920" Background="Black">
+    <UserControl.Resources>
+        <Style x:Key="StackPanelMaxWidth" TargetType="StackPanel">
+            <Setter Property="Width" Value="1920"/>
+        </Style>
+        <Style x:Key="UserControlMaxWidth" TargetType="UserControl">
+            <Setter Property="Width" Value="1920"/>
+        </Style>
+        <Style x:Key="ItemsControlMaxWidth" TargetType="ItemsControl">
+            <Setter Property="Width" Value="1920"/>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height=".1*" x:Name="toolBarRow"/>
             <RowDefinition Height="{Binding DropDownHeight}" x:Name="profileSettingsDropDownRow"/>
             <RowDefinition Height="*" x:Name="roastProfilePlotRow"/>
+            <RowDefinition Height=".1*" x:Name="phaseSliderRow"/>
             <RowDefinition Height=".3*" x:Name="roastProfilePointRow"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="30,5,30,0">
+        <StackPanel Grid.Row="0" Margin="30,5,30,0" Style="{StaticResource StackPanelMaxWidth}">
             <StackPanel Orientation="Horizontal" >
                 <Button Width="32" Height="32" BorderThickness="0" Background="Black" Margin="0,0,10,0" Command="{Binding ConfigureProfileCommand}">
                     <Image Source="/Resources/add new dark theme.png"/>
@@ -28,46 +41,85 @@
                 <Button Width="32" Height="32" BorderThickness="0" Background="Black" Margin="0,0,10,0" Command="{Binding LoadRoastProfileCommand}">
                     <Image Source="/Resources/folder (Freepik) dark theme.png"/>
                 </Button>
-                <!--<Button Width="32" Height="32" BorderThickness="0" Background="White" Margin="0,0,10,0">
-                    <Image Source="/Resources/upload (Those Icons).png"/>
-                </Button>
-                <Button Width="32" Height="32" BorderThickness="0" Background="White" Margin="0,0,10,0">
-                    <Image Source="/Resources/download (Pixel Perfect).png"/>
-                </Button>-->
             </StackPanel>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Height="120" Margin="30,0,30,0">
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Roast Time" FontWeight="Bold" Width="120" Foreground="White"/>
-                <TextBox x:Name="roastTimeSetting" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="40" Margin="0,0,10,0"/>
-                <TextBlock Text="seconds" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Max Temperature" FontWeight="Bold" Width="120" Foreground="White"/>
-                <TextBox x:Name="roastMaxTemperatureSetting" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="40" Margin="0,0,10,0"/>
-                <TextBlock Text="° C" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Min Temperature" FontWeight="Bold" Width="120" Foreground="White"/>
-                <TextBox x:Name="roastMinTemperatureSetting" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="40" Margin="0,0,10,0"/>
-                <TextBlock Text="° C" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-            </StackPanel>
-            <!--<StackPanel Orientation="Horizontal">
-                <Label Content="Min Temperature" FontWeight="Bold" Width="120" Foreground="White"/>
-                <ComboBox ItemsSource="{Binding PhaseColours}"
-                          SelectedItem="{Binding SelectedPhaseColour}"
-                          Width="50">
-                            
-                </ComboBox>
-            </StackPanel>-->
+        <StackPanel Grid.Row="1" Height="120" Margin="30,0,30,0"  Style="{StaticResource StackPanelMaxWidth}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Roast Time" FontWeight="Bold" Width="120" Foreground="White"/>
+                        <TextBox x:Name="roastTimeSetting" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="40" Margin="0,0,10,0"/>
+                        <TextBlock Text="seconds" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Max Temperature" FontWeight="Bold" Width="120" Foreground="White"/>
+                        <TextBox x:Name="roastMaxTemperatureSetting" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="40" Margin="0,0,10,0"/>
+                        <TextBlock Text="° C" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Min Temperature" FontWeight="Bold" Width="120" Foreground="White"/>
+                        <TextBox x:Name="roastMinTemperatureSetting" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="40" Margin="0,0,10,0"/>
+                        <TextBlock Text="° C" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                    </StackPanel>
+
+                </StackPanel>
+
+            </Grid>
+
         </StackPanel>
 
-        <UserControl Grid.Row="2">
+        <UserControl Grid.Row="2" Style="{StaticResource UserControlMaxWidth}">
             <ScottPlot:WpfPlot Content="{Binding RoastProfilePlot}"></ScottPlot:WpfPlot>
         </UserControl>
 
-        <ItemsControl ItemsSource="{Binding RoastPointItems}" Grid.Row="3">
+        <!--<ItemsControl ItemsSource="{Binding PhaseItems}" Grid.Row="3" Margin="50,0,10,0" Style="{StaticResource ItemsControlMaxWidth}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.Resources>
+
+                <DataTemplate DataType="{x:Type vm:PhaseGroupButton}">
+                    <ContentControl>
+                        <Button Width="32" Height="32" BorderThickness="0" Background="Black" Command="{Binding DataContext.AddNewPhaseGroupItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+                            <Image Source="/Resources/width-add dark theme.png"/>
+                        </Button>
+                    </ContentControl>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type vm:PhaseGroupItem}">
+                    <ContentControl>
+                        <Border Width="{Binding PhaseRange}" Background="{Binding Colour}">
+                            <StackPanel>
+                                <TextBox Width="90" HorizontalAlignment="Center" Text="{Binding PhaseName}"/>
+                                <StackPanel Orientation="Horizontal" >
+                                    <TextBlock Text="Phase Start"/>
+                                    <TextBox Text="{Binding PhaseStart}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Phase End"/>
+                                    <TextBox Text="{Binding PhaseEnd}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </ContentControl>
+                </DataTemplate>
+
+            </ItemsControl.Resources>
+        </ItemsControl>-->
+
+        <ItemsControl ItemsSource="{Binding RoastPointItems}" Grid.Row="4" Margin="35,0,10,0"  Style="{StaticResource ItemsControlMaxWidth}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal"/>
@@ -87,24 +139,34 @@
                     </ContentControl>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:RoastPointItem}">
-                    <Border Width="200" Height="180" Margin="5" Background="{Binding Color}" CornerRadius="15">
+                    <Border Width="200" Height="180" Margin="5" Background="{Binding Colour}" CornerRadius="15">
                         <StackPanel>
-                            <TextBox Text="{Binding RoastPoint.StageName, Mode=TwoWay}" Width="150" TextAlignment="Center" TextWrapping="Wrap" Foreground="White" Background="{Binding Color}" BorderThickness="0" FontWeight="Bold" FontSize="14" Margin="10" HorizontalAlignment="Center"/>
+                            <TextBox Text="{Binding RoastPoint.StageName, Mode=TwoWay}" Width="150" TextAlignment="Center" TextWrapping="Wrap" Foreground="White" Background="{Binding Colour}" BorderThickness="0" FontWeight="Bold" FontSize="14" Margin="10" HorizontalAlignment="Center"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Label Content="Temperature" FontWeight="Bold" FontSize="14" Foreground="White" Background="{Binding Color}" Width="120"/>
-                                <TextBox Text="{Binding RoastPoint.Temperature}" FontSize="14" Foreground="White" Background="{Binding Color}" Width="30" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <TextBlock Text="° C" FontSize="14" Foreground="White" Background="{Binding Color}" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Label Content="Temperature" FontWeight="Bold" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="120"/>
+                                <TextBox Text="{Binding RoastPoint.Temperature}" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="30" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBlock Text="° C" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Label Content="Start Seconds" FontWeight="Bold" FontSize="14" Foreground="White" Background="{Binding Color}" Width="120"/>
-                                <TextBox Text="{Binding RoastPoint.StartSeconds}" FontSize="14" Foreground="White" Background="{Binding Color}" Width="30" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <TextBlock Text="s" FontSize="14" Foreground="White" Background="{Binding Color}" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Label Content="Start Seconds" FontWeight="Bold" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="120"/>
+                                <TextBox Text="{Binding RoastPoint.StartSeconds}" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="30" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBlock Text="s" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Label Content="End Seconds" FontWeight="Bold" FontSize="14" Foreground="White" Background="{Binding Color}" Width="120"/>
-                                <TextBox Text="{Binding RoastPoint.EndSeconds}" FontSize="14" Foreground="White" Background="{Binding Color}" Width="30" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <TextBlock Text="s" FontSize="14" Foreground="White" Background="{Binding Color}" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Label Content="End Seconds" FontWeight="Bold" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="120"/>
+                                <TextBox Text="{Binding RoastPoint.EndSeconds}" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="30" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBlock Text="s" FontSize="14" Foreground="White" Background="{Binding Colour}" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </StackPanel>
+                            <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Label Content="Phase Group" FontWeight="Bold" FontSize="14" Foreground="White" Background="{Binding Color}" Width="120"/>
+                                <ComboBox ItemsSource="{Binding PhaseItems}" SelectedItem="{Binding SelectedPhaseItem}" >
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding PhaseName}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>-->
                         </StackPanel>
                     </Border>
                 </DataTemplate>

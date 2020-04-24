@@ -1,64 +1,72 @@
-﻿using CoffeeRoasterDesktopBackground;
+﻿using CoffeeRoasterDesktopBackgroundLibrary;
 using Prism.Commands;
+using SimpleTCP;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Security.Cryptography.Xml;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CoffeeRoasterDesktopUI.ViewModels
 {
-    public class SystemSettingsViewModel : INotifyPropertyChanged, ITabViewModel
+    public class SystemSettingsViewModel : INotifyPropertyChanged, ITabViewModel, IDisposable
     {
+        private readonly RoasterConnection roasterConnection;
         public int IpOne { get; set; } = 192;
         public int IpTwo { get; set; } = 168;
         public int IpThree { get; set; } = 1;
         public int IpFour { get; set; } = 2;
         public int PortNumber { get; set; } = 8180;
         public string Name { get; set; } = "System Settings";
+        public string ConnectionStatus { get; set; } = "Disconnected";
         public ICommand OnWifiConnectPressed { get; }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly ConfigurationService configurationService;
-        private Configuration configuration;
+        private IDisposable connectionSubscription;
 
-        public SystemSettingsViewModel()
+        public SystemSettingsViewModel(RoasterConnection connection)
         {
-            configurationService = new ConfigurationService();
-            configuration = configurationService.SystemConfiguration;
-            if (configuration != null)
+            if (connection.Configuration != null)
             {
+                roasterConnection = connection;
                 GetConfigurationData();
                 PropertyChanged += SystemSettingsViewModel_PropertyChanged;
-                OnWifiConnectPressed = new DelegateCommand(SetConfigurationData);
+                OnWifiConnectPressed = new DelegateCommand(ConnectoToRoaster);
             }
 
+
+            connectionSubscription = roasterConnection.WiFiConnected.Do(UpdateConncectionStatus).Subscribe();
+
+        }
+
+        private void UpdateConncectionStatus(bool connected)
+        {
+            ConnectionStatus = connected ? "Connected" : "Disconnected";
         }
 
         private void SystemSettingsViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            SetConfigurationData();
+            ConnectoToRoaster();
         }
 
-        private void SetConfigurationData()
+        private void ConnectoToRoaster()
         {
             var ipaddress = $"{IpOne}.{IpTwo}.{IpThree}.{IpFour}";
 
-            var newConfiguration = new Configuration
+            var couldUpdateConfiguration = roasterConnection.UpdateConfiguration(ipaddress, PortNumber);
+
+            if (couldUpdateConfiguration)
             {
-                IpAddress = ipaddress,
-                PortNumber = PortNumber,
-                LogFileDatabaseDirectory = configuration.LogFileDatabaseDirectory
-            };
-            // todo notify user that it has been saved
-            var couldSaveConfiguration = configurationService.SaveConfiguration(newConfiguration);
+                roasterConnection.ConnectToDevice();
+            }
         }
 
         private void GetConfigurationData()
         {
-            var ipaddress = configuration.IpAddress.Split(".");
+            var ipaddress = roasterConnection.Configuration.IpAddress.Split(".");
             int.TryParse(ipaddress[0], out int ipOne);
             int.TryParse(ipaddress[1], out int ipTwo);
             int.TryParse(ipaddress[2], out int ipThree);
@@ -69,7 +77,12 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             IpThree = ipThree;
             IpFour = ipFour;
 
-            PortNumber = configuration.PortNumber;
+            PortNumber = roasterConnection.Configuration.PortNumber;
+        }
+
+        public void Dispose()
+        {
+            connectionSubscription.Dispose();
         }
     }
 }

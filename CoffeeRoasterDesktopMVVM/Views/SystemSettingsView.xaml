@@ -35,6 +35,10 @@
                 <Label Content="Port Number of Roaster" FontWeight="Bold" Width="150"/>
                 <TextBox Width="50" x:Name="PortNumber" Text="{Binding PortNumber}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"></TextBox>
             </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Connection" FontWeight="Bold" Width="150"/>
+                <TextBlock Width="50" x:Name="ConnectionStatus" Text="{Binding ConnectionStatus}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Width="64" Height="64" BorderThickness="0" Background="White" Margin="0,0,10,0" Command="{Binding OnWifiConnectPressed}">

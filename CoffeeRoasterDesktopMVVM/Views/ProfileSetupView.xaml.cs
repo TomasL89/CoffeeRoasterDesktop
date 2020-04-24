@@ -22,10 +22,6 @@ namespace CoffeeRoasterDesktopUI.Views
         {
             InitializeComponent();
         }
-
-        private void ItemsControl_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-
-        }
+      
     }
 }

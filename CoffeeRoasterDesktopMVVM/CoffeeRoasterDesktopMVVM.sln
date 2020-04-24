@@ -8,11 +8,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoffeeRoasterDesktopUI", "C
 		{5E70AE12-AC9F-4C84-8A9A-760623362CFC} = {5E70AE12-AC9F-4C84-8A9A-760623362CFC}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoffeeRoasterDesktopBackground", "..\CoffeeRoasterDesktopBackground\CoffeeRoasterDesktopBackground.csproj", "{5E70AE12-AC9F-4C84-8A9A-760623362CFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoffeeRoasterDesktopCLI", "..\CoffeeRoasterDesktopBackground\CoffeeRoasterDesktopCLI.csproj", "{5E70AE12-AC9F-4C84-8A9A-760623362CFC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messages", "..\Messages\Messages.csproj", "{3ECE7524-13C5-404A-9B1F-96D14E90D63E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoffeeRoasterDesktopBackgroundLibrary", "..\CoffeeRoasterDesktopBackgroundLibrary\CoffeeRoasterDesktopBackgroundLibrary.csproj", "{07050095-C8A9-4FE0-846D-3E8D7C5CE980}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoffeeRoasterDesktopBackgroundLibrary", "..\CoffeeRoasterDesktopBackgroundLibrary\CoffeeRoasterDesktopBackgroundLibrary.csproj", "{07050095-C8A9-4FE0-846D-3E8D7C5CE980}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

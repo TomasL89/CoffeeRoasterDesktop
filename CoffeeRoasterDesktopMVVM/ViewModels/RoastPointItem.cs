@@ -14,7 +14,6 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public new PointType PointType { get; set; } = PointType.ProfilePoint;
         public RoastPoint RoastPoint { get; set; }
         public SolidColorBrush Colour { get; set; }
-        public int PhaseGroup { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
