@@ -163,6 +163,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void SendProfile()
         {
+            // todo this shouldn't be here, the timeouts and should be in the connection
             try
             {
                 for (var i = 0; i < PROFILE_ATTEMPT_LIMIT; i++)
@@ -186,6 +187,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void StartRoast()
         {
+            RoastPlot.plt.Clear();
             roastId = dataLogger.CreateLog();
             if (roastId != null)
             {
@@ -270,7 +272,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
                 foreach (var rp in roastPoints)
                 {
-                    RoastPlot.plt.PlotText(rp.StageName, rp.EndSeconds + 1, rp.Temperature + 1, System.Drawing.Color.White, fontName: null, 16);
+                    RoastPlot.plt.PlotText(rp.StageName, rp.EndSeconds + 1, rp.Temperature + 1, System.Drawing.Color.Black, fontName: null, 16);
                 }
 
                 RoastPlot.Render();
@@ -295,13 +297,16 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             //profilePlot.plt.Style(bg, dg, gg, tg, System.Drawing.Color.Pink, System.Drawing.Color.Yellow);
             profilePlot.plt.PlotScatter(profileXs, profileYs, markerShape: MarkerShape.none, color: System.Drawing.Color.Red, lineWidth: 2);
             profilePlot.plt.Axis(x1: 0, x2: 900, y1: 0, y2: 210);
-            foreach (var rp in roastPoints)
-            {
-                profilePlot.plt.PlotText(rp.StageName, rp.EndSeconds + 1, rp.Temperature + 1, System.Drawing.Color.White, fontName: null, 16);
-            }
 
             RoastPlot.plt.Add(profilePlot.plt.GetPlottables().First());
             RoastPlot.plt.Style(null, bg, gg, tg);
+            RoastPlot.plt.Title(RoastProfile.RoastName);
+
+            foreach (var rp in roastPoints)
+            {
+                RoastPlot.plt.PlotText(rp.StageName, rp.EndSeconds + 1, rp.Temperature + 1, System.Drawing.Color.Black, fontName: null, 16);
+            }
+
             RoastPlot.Dispatcher.Invoke(new Action(() =>
             {
                 RoastPlot.Render();

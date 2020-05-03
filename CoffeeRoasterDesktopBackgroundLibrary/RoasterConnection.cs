@@ -20,6 +20,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
         public Configuration Configuration { get; set; }
 
         private readonly ConfigurationService configurationService;
+        private string lastMessageReceived;
 
         public RoasterConnection()
         {
@@ -83,8 +84,10 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 
         public void SendMessageToDevice(string message)
         {
+            if (client.TcpClient.Connected)
+                client.WriteLine(message);
+
             // if (client.TcpClient != null)
-            client.WriteLine(message);
         }
 
         public string SendMessageToDeviceWithReply(string message)
@@ -96,30 +99,34 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 
         public void HandleIncomingMessage(string message)
         {
-            var incomingMessage = message.ToString().Split(":");
-
-            if (incomingMessage.Count() == 0)
-                return;
-
-            int.TryParse(incomingMessage[0], out int messageType);
-
-            switch (messageType)
+            if (!string.Equals(lastMessageReceived, message, StringComparison.InvariantCultureIgnoreCase))
             {
-                case 1:
-                    HandleTemperatureMessage(incomingMessage);
-                    break;
+                var incomingMessage = message.ToString().Split(":");
 
-                case 2:
-                    HandleSystemMessage(incomingMessage);
-                    break;
+                if (incomingMessage.Count() == 0)
+                    return;
 
-                case 3:
-                    HandleErrorMessage(incomingMessage);
-                    break;
+                int.TryParse(incomingMessage[0], out int messageType);
 
-                case 0:
-                default:
-                    break;
+                switch (messageType)
+                {
+                    case 1:
+                        HandleTemperatureMessage(incomingMessage);
+                        break;
+
+                    case 2:
+                        HandleSystemMessage(incomingMessage);
+                        break;
+
+                    case 3:
+                        HandleErrorMessage(incomingMessage);
+                        break;
+
+                    case 0:
+                    default:
+                        break;
+                }
+                lastMessageReceived = message;
             }
         }
 

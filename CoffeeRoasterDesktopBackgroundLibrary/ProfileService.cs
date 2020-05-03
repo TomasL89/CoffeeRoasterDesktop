@@ -31,5 +31,10 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 
             return profile;
         }
+
+        public RoastProfile LoadProfileFromMessage(string message)
+        {
+            return JsonConvert.DeserializeObject<RoastProfile>(message);
+        }
     }
 }
