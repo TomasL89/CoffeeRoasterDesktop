@@ -3,5 +3,6 @@
     public interface ITabViewModel
     {
         string Name { get; }
+        string ImageSource { get; }
     }
 }

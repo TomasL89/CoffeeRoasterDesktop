@@ -10,19 +10,47 @@
   <ItemGroup>
     <None Remove="Resources\add new dark theme.png" />
     <None Remove="Resources\adjust %28dmitri13%29.png" />
+    <None Remove="Resources\analysis %28Freepik%29.png" />
+    <None Remove="Resources\bean temperature%28Pixel perfect%29.png" />
+    <None Remove="Resources\business %28DinosoftLabs%29.png" />
     <None Remove="Resources\circle add dark theme.png" />
     <None Remove="Resources\close %28Those Icons%29.png" />
     <None Remove="Resources\confirm %28Roundicons%29.png" />
+    <None Remove="Resources\connect %28Freepik%29.png" />
+    <None Remove="Resources\cr_icon__freepik__twv_icon.ico" />
     <None Remove="Resources\download %28Pixel Perfect%29.png" />
+    <None Remove="Resources\first crack.png" />
+    <None Remove="Resources\flame %28 Kirill Kazachek%29.png" />
     <None Remove="Resources\folder %28Freepik%29 dark theme.png" />
     <None Remove="Resources\folder %28Freepik%29.png" />
+    <None Remove="Resources\heater %28Smashicons%29.bmp" />
+    <None Remove="Resources\heater %28Smashicons%29.png" />
+    <None Remove="Resources\interface %28Freepik%29.png" />
+    <None Remove="Resources\invalid profile v2 %28DinosoftLabs%29.png" />
+    <None Remove="Resources\load report.png" />
+    <None Remove="Resources\measurer %28Freepik%29.png" />
+    <None Remove="Resources\photo %28Good Ware%29.png" />
+    <None Remove="Resources\processor %28Those Icons%29.png" />
+    <None Remove="Resources\progress %28Freepik%29.png" />
+    <None Remove="Resources\refresh %28Freepik%29.png" />
+    <None Remove="Resources\run %28Freepik%29.png" />
+    <None Remove="Resources\save report.png" />
     <None Remove="Resources\save-icon %28Those-Icons%29 dark theme.png" />
     <None Remove="Resources\save-icon %28Those-Icons%29.png" />
     <None Remove="Resources\settings %28Good Ware%29.png" />
+    <None Remove="Resources\signal %28Pixel perfect%29.png" />
+    <None Remove="Resources\stop %28Chanut%29.png" />
+    <None Remove="Resources\thermometer %28hirschwolf%29.png" />
+    <None Remove="Resources\thermostat %28Freepik%29.png" />
     <None Remove="Resources\upload %28Those Icons%29.png" />
+    <None Remove="Resources\upload profile %28Freepik%29.png" />
+    <None Remove="Resources\valid profile v2 %28DinosoftLabs%29.png" />
+    <None Remove="Resources\verify %28DinosoftLabs%29.png" />
+    <None Remove="Resources\verify profile (Freepik).png" />
     <None Remove="Resources\width-add dark theme.png" />
     <None Remove="Resources\width-add.png" />
     <None Remove="Resources\wifi %28Roundicons%29.png" />
+    <None Remove="Resources\wifi 2 %28Freepik%29.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +58,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\adjust (dmitri13).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\analysis (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\business (DinosoftLabs).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\circle add dark theme.png">
@@ -41,13 +75,58 @@
     <Content Include="Resources\confirm (Roundicons).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\connect (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\cr_icon__freepik__twv_icon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\download (Pixel Perfect).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\first crack.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\flame ( Kirill Kazachek).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\folder (Freepik) dark theme.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\folder (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\heater (Smashicons).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\interface (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\invalid profile v2 (DinosoftLabs).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\load report.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\measurer (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\photo (Good Ware).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\processor (Those Icons).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\progress (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\refresh (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\run (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\save report.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\save-icon (Those-Icons) dark theme.png">
@@ -59,13 +138,40 @@
     <Content Include="Resources\settings (Good Ware).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\signal (Pixel perfect).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\stop (Chanut).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\thermometer (hirschwolf).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\thermostat (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\upload (Those Icons).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\upload profile (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\valid profile v2 (DinosoftLabs).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\verify (DinosoftLabs).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\verify profile %28Freepik%29.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\width-add.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\wifi (Roundicons).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\wifi 2 (Freepik).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -82,6 +188,7 @@
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
     <PackageReference Include="ScottPlot" Version="4.0.25" />
     <PackageReference Include="ScottPlot.WPF" Version="4.0.25" />
+    <PackageReference Include="SimpleTCP" Version="1.0.24" />
     <PackageReference Include="System.Reactive" Version="4.4.1" />
   </ItemGroup>
 
@@ -96,4 +203,9 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Resources\bean temperature(Pixel perfect).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

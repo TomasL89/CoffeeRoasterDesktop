@@ -22,32 +22,40 @@ namespace CoffeeRoasterDesktopCLI
             roasterConnection = new RoasterConnection();
             //await roasterConnection.UpdateConfigurationAsync("192.168.1.109", 8180);
 
+            disposable = new CompositeDisposable
+            {
+                roasterConnection.WiFiConnected.Do(x=> Connect()).Subscribe(),
+                roasterConnection.MessageRecieved.Subscribe(x => displayMessage(x))
+            };
             roasterConnection.UpdateConfiguration("192.168.1.109", 8180);
             Console.WriteLine($"Attempting connection on 192.168.1.109: {8180}");
             roasterConnection.ConnectToDevice();
-            disposable = new CompositeDisposable
-            {
-                roasterConnection.WiFiConnected.Subscribe(x => displayMessage(x)),
-                roasterConnection.MessageRecieved.Subscribe(x => displayMessage(x))
-            };
-            Console.WriteLine("Connected");
+           
             //var timer = new System.Timers.Timer();
             //timer.AutoReset = true;
             //timer.Interval = 5000;
             //timer.Elapsed += GetTemperatureMessage;
             //timer.Enabled = true;
 
+
             Console.WriteLine("Running");
+            
             while (true)
             {
                 var inputMessage = Console.ReadLine();
                 if (string.Equals(inputMessage, "quit", StringComparison.InvariantCultureIgnoreCase))
                     break;
-                roasterConnection.SendMessageToDevice("get");
+               // roasterConnection.SendMessageToDevice("get");
 
             }
             Console.WriteLine("Closing Application");
             disposable.Dispose();
+        }
+
+        private static void Connect()
+        {
+            Console.WriteLine("Connected");
+            roasterConnection.SendMessageToDevice("Start");
         }
 
         private static void GetTemperatureMessage(Object source, System.Timers.ElapsedEventArgs e)

@@ -1,45 +1,40 @@
-﻿using CoffeeRoasterDesktopBackgroundLibrary;
+﻿using CoffeeRoasterDesktopBackground;
+using CoffeeRoasterDesktopBackgroundLibrary;
 using Prism.Commands;
-using SimpleTCP;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CoffeeRoasterDesktopUI.ViewModels
 {
     public class SystemSettingsViewModel : INotifyPropertyChanged, ITabViewModel, IDisposable
     {
-        private readonly RoasterConnection roasterConnection;
         public int IpOne { get; set; } = 192;
         public int IpTwo { get; set; } = 168;
         public int IpThree { get; set; } = 1;
         public int IpFour { get; set; } = 2;
         public int PortNumber { get; set; } = 8180;
         public string Name { get; set; } = "System Settings";
+        public string ImageSource { get; } = "/Resources/interface (Freepik).png";
         public string ConnectionStatus { get; set; } = "Disconnected";
+
         public ICommand OnWifiConnectPressed { get; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private IDisposable connectionSubscription;
+        private readonly ConfigurationService configurationService;
 
-        public SystemSettingsViewModel(RoasterConnection connection)
+        public SystemSettingsViewModel(RoasterConnection roasterConnection)
         {
-            if (connection.Configuration != null)
+            if (roasterConnection is null)
             {
-                roasterConnection = connection;
-                GetConfigurationData();
-                PropertyChanged += SystemSettingsViewModel_PropertyChanged;
-                OnWifiConnectPressed = new DelegateCommand(ConnectoToRoaster);
+                // todo flag user to connect
             }
 
-
-            connectionSubscription = roasterConnection.WiFiConnected.Do(UpdateConncectionStatus).Subscribe();
-
+            configurationService = new ConfigurationService();
+            GetConfigurationData();
+            PropertyChanged += SystemSettingsViewModel_PropertyChanged;
+            OnWifiConnectPressed = new DelegateCommand(ConnectoToRoaster);
         }
 
         private void UpdateConncectionStatus(bool connected)
@@ -49,24 +44,18 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void SystemSettingsViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            ConnectoToRoaster();
         }
 
         private void ConnectoToRoaster()
         {
             var ipaddress = $"{IpOne}.{IpTwo}.{IpThree}.{IpFour}";
 
-            var couldUpdateConfiguration = roasterConnection.UpdateConfiguration(ipaddress, PortNumber);
-
-            if (couldUpdateConfiguration)
-            {
-                roasterConnection.ConnectToDevice();
-            }
+            var couldUpdateConfiguration = configurationService.UpdateConfiguration(ipaddress, PortNumber);
         }
 
         private void GetConfigurationData()
         {
-            var ipaddress = roasterConnection.Configuration.IpAddress.Split(".");
+            var ipaddress = configurationService.SystemConfiguration.IpAddress.Split(".");
             int.TryParse(ipaddress[0], out int ipOne);
             int.TryParse(ipaddress[1], out int ipTwo);
             int.TryParse(ipaddress[2], out int ipThree);
@@ -77,12 +66,11 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             IpThree = ipThree;
             IpFour = ipFour;
 
-            PortNumber = roasterConnection.Configuration.PortNumber;
+            PortNumber = configurationService.SystemConfiguration.PortNumber;
         }
 
         public void Dispose()
         {
-            connectionSubscription.Dispose();
         }
     }
 }

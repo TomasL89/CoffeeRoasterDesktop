@@ -1,6 +1,4 @@
-﻿using Caliburn.Micro;
-using CoffeeRoasterDesktopBackgroundLibrary;
-using Newtonsoft.Json;
+﻿using CoffeeRoasterDesktopBackgroundLibrary;
 using Prism.Commands;
 using ScottPlot;
 using System;
@@ -10,31 +8,31 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
-using Xceed.Wpf.Toolkit;
 
 namespace CoffeeRoasterDesktopUI.ViewModels
 {
     public class ProfileSetupViewModel : ITabViewModel, INotifyPropertyChanged
     {
-        const int DefaultTimeInSeconds = 900;
-        const int DefaultMaxTemperature = 250;
-        const int DefaultMinTemperature = 30;
-        const int DefaultDropDownHeight = 100;
-        const int DefaultWindowWidth = 1800;
+        private const int DefaultTimeInSeconds = 900;
+        private const int DefaultMaxTemperature = 250;
+        private const int DefaultMinTemperature = 30;
+        private const int DefaultDropDownHeight = 100;
+        private const int DefaultWindowWidth = 1800;
 
         public int DropDownHeight { get; set; }
         public int RoastTimeInSeconds { get; set; } = DefaultTimeInSeconds;
         public int RoastTemperatureMax { get; set; } = DefaultMaxTemperature;
         public int RoastTemperatureMin { get; set; } = DefaultMinTemperature;
         public ObservableCollection<RoastProfilePointBase> RoastPointItems { get; set; } = new ObservableCollection<RoastProfilePointBase>();
-        // public ObservableCollection<PhaseItem> ProfilePhaseItems { get; } = new ObservableCollection<PhaseItem>();
+
         public ObservableCollection<PhaseGroupBase> PhaseItems { get; } = new ObservableCollection<PhaseGroupBase>();
+
         public string Name { get; set; } = "Profile Setup";
+        public string ImageSource { get; } = "/Resources/business (DinosoftLabs).png";
         public RoastProfile RoastProfile { get; private set; }
         public ICommand AddNewRoastPointCommand { get; }
         public ICommand SaveRoastProfileCommand { get; }
@@ -45,6 +43,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         //  public ICommand AddPhaseGroupCommand { get; }
         public WpfPlot RoastProfilePlot { get; set; }
+
         public string PhaseName { get; set; }
         public Color SelectedColour { get; set; }
 
@@ -71,7 +70,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             LoadRoastProfileCommand = new DelegateCommand(LoadRoastProfile);
             ConfigureProfileCommand = new DelegateCommand(ConfigureProfile);
             AddNewPhaseGroupItemCommand = new DelegateCommand(AddNewPhaseGroupItem);
-           // AddPhaseGroupCommand = new DelegateCommand(AddPhaseGroupItem);
+            // AddPhaseGroupCommand = new DelegateCommand(AddPhaseGroupItem);
             colours.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc693")));
             colours.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8eb08a")));
             colours.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#659784")));
@@ -113,14 +112,12 @@ namespace CoffeeRoasterDesktopUI.ViewModels
                 PhaseRange = DefaultWindowWidth
             };
 
-
-
             phaseItems.Add(phaseGroupItem);
             var phaseButton = PhaseItems.Last();
             PhaseItems.Clear();
             PhaseItems.Add(phaseButton);
             var rebuildCounter = 0;
-            foreach(var phaseItem in phaseItems)
+            foreach (var phaseItem in phaseItems)
             {
                 phaseItem.PhaseRange = DefaultWindowWidth / phaseItems.Count;
                 PhaseItems.Insert(rebuildCounter, phaseItem);
@@ -130,14 +127,10 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             //PhaseItems.Add(phaseGroupItem);
             //PhaseItems.Insert(phaseIndexCounter, phaseGroupItem);
             phaseIndexCounter += 1;
-
         }
-
-
 
         private void ConfigureProfile()
         {
-
             DropDownHeight = DropDownHeight > 0 ? 0 : DefaultDropDownHeight;
         }
 
@@ -169,10 +162,10 @@ namespace CoffeeRoasterDesktopUI.ViewModels
                 var roastProfile = new RoastProfile
                 {
                     RoastLengthTotalInSeconds = RoastTimeInSeconds,
-                    RoastName = new FileInfo(sfd.FileName).Name.Replace(".json",""),
+                    RoastName = new FileInfo(sfd.FileName).Name.Replace(".json", ""),
                     RoastPoints = roastPoints
                 };
-               
+
                 ProfileService.SaveProfile(sfd.FileName, roastProfile);
             }
         }
@@ -241,11 +234,10 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             {
                 var roastPoint = roastPoints[i];
                 // font color needs to be a single color and readable with the colors
-               // var roastPointColor = System.Drawing.Color.FromArgb(brushColor.Color.A, brushColor.Color.R, brushColor.Color.G, brushColor.Color.B);
-               // RoastProfilePlot.plt.PlotHSpan(roastPoints[i].StartSeconds, roastPoints[i].EndSeconds, roastPointColor);
+                // var roastPointColor = System.Drawing.Color.FromArgb(brushColor.Color.A, brushColor.Color.R, brushColor.Color.G, brushColor.Color.B);
+                // RoastProfilePlot.plt.PlotHSpan(roastPoints[i].StartSeconds, roastPoints[i].EndSeconds, roastPointColor);
                 // this calculation needs to be a little better with accounting for the text length
                 RoastProfilePlot.plt.PlotText(roastPoint.StageName, roastPoints[i].EndSeconds + 1, roastPoints[i].Temperature + 1, System.Drawing.Color.White, fontName: null, 16);
-
             }
             // todo fix this so it doesn't throw anything
             try
@@ -254,10 +246,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             }
             catch (Exception)
             {
-
             }
-
-
         }
 
         private void AddNewRoastPoint()

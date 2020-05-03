@@ -12,7 +12,6 @@ namespace CoffeeRoasterDesktopBackground
         private readonly string directory;
         private readonly JsonSerializer jsonSerializer;
 
-
         //todo system configuration changed event
 
         public ConfigurationService()
@@ -22,7 +21,7 @@ namespace CoffeeRoasterDesktopBackground
             configurationLocation = Path.Combine(directory, "system.cfg");
             if (!File.Exists(configurationLocation))
             {
-                // warn user to create a new configuration?? 
+                // warn user to create a new configuration??
                 var validConfiguraiton = CreateNewDefaultConfiguration();
                 SystemConfiguration = validConfiguraiton ?? throw new Exception("Error with configuration, please log issue");
 
@@ -38,7 +37,7 @@ namespace CoffeeRoasterDesktopBackground
             {
                 IpAddress = "192.168.0.0",
                 PortNumber = 8180,
-                LogFileDatabaseDirectory = directory
+                LogFileDatabaseDirectory = Path.Combine(directory, "roast.db")
             };
 
             var couldSaveNewConfiguraiton = SaveConfiguration(configuration);
@@ -59,7 +58,7 @@ namespace CoffeeRoasterDesktopBackground
                 SystemConfiguration = JsonConvert.DeserializeObject<Configuration>(configurationFile);
                 //SystemConfiguration =  await JsonSerializer.DeserializeAsync<Configuration>(configurationFile);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // todo see how well this works
                 return new Configuration();
@@ -76,13 +75,21 @@ namespace CoffeeRoasterDesktopBackground
                 using var writer = new JsonTextWriter(sw);
                 jsonSerializer.Serialize(writer, configuration);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // todo handle exceptions here, display a warning message
                 return false;
             }
 
             return true;
+        }
+
+        public bool UpdateConfiguration(string ipaddress, int portNumber)
+        {
+            SystemConfiguration.IpAddress = ipaddress;
+            SystemConfiguration.PortNumber = portNumber;
+
+            return SaveConfiguration(SystemConfiguration);
         }
     }
 }

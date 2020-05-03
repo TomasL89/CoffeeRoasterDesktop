@@ -3,28 +3,51 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:tabControlViewModel="clr-namespace:CoffeeRoasterDesktopUI.ViewModels" 
+        xmlns:tabControlViewModel="clr-namespace:CoffeeRoasterDesktopUI.ViewModels"
         xmlns:tabs="clr-namespace:CoffeeRoasterDesktopUI.Views"
         mc:Ignorable="d"
+        Icon="/Resources/cr_icon__freepik__twv_icon.ico"
+        xmlns:styles="clr-namespace:CoffeeRoasterDesktopUI.Styles"
+        ResizeMode="NoResize"
         Title="Coffee Roaster Manager" MinHeight="1080" MinWidth="1920">
-    <Grid>
-        <TabControl TabStripPlacement="Left" ItemsSource="{Binding Tabs}">
+    <Grid Background="{Binding Source={x:Static styles:PlotStyle.ColormindGreen}}">
+        <TabControl TabStripPlacement="Left" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" BorderThickness="0"  Background="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}">
             <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <StackPanel Orientation="Horizontal" Height="40" Name="TabName" Background="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}">
+                                    <Image Source="{Binding ImageSource}" Width="32" Height="32" />
+                                    <TextBlock Text="{Binding Name}" Width="100" Margin="10,10,0,0" FontWeight="Bold" />
+                                </StackPanel>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter Property="Background" Value="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}" />
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter TargetName="TabName" Property="Background" Value="{Binding Source={x:Static styles:PlotStyle.ColormindGreen}}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="{Binding Source={x:Static styles:PlotStyle.ColormindGreen}}" />
+                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter TargetName="TabName" Property="Background" Value="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+
                 <DataTemplate DataType="{x:Type tabControlViewModel:RoastViewModel}">
-                    <tabs:RoastView/>
+                    <tabs:RoastView />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type tabControlViewModel:ProfileSetupViewModel}">
-                    <tabs:ProfileSetupView/>
+                    <tabs:ProfileSetupView />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type tabControlViewModel:SystemSettingsViewModel}">
-                    <tabs:SystemSettingsView/>
+                    <tabs:SystemSettingsView />
                 </DataTemplate>
             </TabControl.Resources>
-            <TabControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type tabControlViewModel:ITabViewModel}">
-                    <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
         </TabControl>
     </Grid>
 </Window>

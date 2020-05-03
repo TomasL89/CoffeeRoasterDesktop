@@ -1,8 +1,7 @@
-﻿using System.Collections.Specialized;
-using System.ComponentModel;
-
-namespace CoffeeRoasterDesktopBackgroundLibrary
+﻿namespace CoffeeRoasterDesktopBackgroundLibrary
 {
+    using System.ComponentModel;
+
     public class RoastPoint : INotifyPropertyChanged
     {
         public int StagePoint { get; set; }

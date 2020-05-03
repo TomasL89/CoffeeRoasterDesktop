@@ -2,30 +2,37 @@
 using CoffeeRoasterDesktopBackgroundLibrary;
 using CoffeeRoasterDesktopUI.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows.Media;
+using System.Linq;
 
 namespace CoffeeRoasterDesktopMVVM.ViewModels
 {
     public class ShellViewModel : Conductor<object>
     {
-		public ObservableCollection<ITabViewModel> Tabs { get; private set; }
-		private readonly RoasterConnection roasterConnection;
+        public ObservableCollection<ITabViewModel> Tabs { get; private set; }
+        public ITabViewModel SelectedTab { get; set; }
+        private readonly RoasterConnection roasterConnection;
 
-		public ShellViewModel()
-		{
-			roasterConnection = new RoasterConnection();
+        public ShellViewModel()
+        {
+            roasterConnection = new RoasterConnection();
 
-			Tabs = new ObservableCollection<ITabViewModel>
-			{
-				new RoastViewModel(roasterConnection),
-				new ProfileSetupViewModel(roasterConnection),
-				new SystemSettingsViewModel(roasterConnection)
-			};
-		}
+            try
+            {
+                roasterConnection.ConnectToDevice();
+            }
+            catch (Exception)
+            {
+            }
 
-	}
+            Tabs = new ObservableCollection<ITabViewModel>
+            {
+                new RoastViewModel(roasterConnection),
+                new ProfileSetupViewModel(roasterConnection),
+                new SystemSettingsViewModel(roasterConnection)
+            };
+
+            SelectedTab = Tabs.First();
+        }
+    }
 }
