@@ -87,7 +87,7 @@
                         <Button Width="48" Height="48" BorderThickness="0" Command="{Binding StartRoastCommand}">
                             <Image Source="/Resources/first crack.png" />
                         </Button>
-                        <TextBlock Text="10:00 (mm:ss)" Margin="60,16,10,0" />
+                        <TextBlock Text="{Binding FirstCrackTimeStampSeconds}" Margin="60,16,10,0" />
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -97,13 +97,12 @@
                     <TextBlock Text="Report" Margin="5" FontWeight="Bold" HorizontalAlignment="Right" />
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="15">
-                        <Button Width="48" Height="48" BorderThickness="0" Margin="0,0,10,0" Command="{Binding StartRoastCommand}">
+                        <Button Width="48" Height="48" BorderThickness="0" Margin="0,0,10,0" Command="{Binding SaveReportCommand}">
                             <Image Source="/Resources/save report.png" />
                         </Button>
-                        <Button Width="48" Height="48" BorderThickness="0" Margin="0,0,10,0" Command="{Binding StartRoastCommand}">
+                        <Button Width="48" Height="48" BorderThickness="0" Margin="0,0,10,0" Command="{Binding LoadReportCommand}">
                             <Image Source="/Resources/load report.png" />
                         </Button>
-                        <!--<TextBlock Text="10:00 (mm:ss)" Margin="60,0,10,0" />-->
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -117,7 +116,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/signal (Pixel perfect).png" Width="32" Height="32" />
-                        <TextBlock Text="100%" Margin="120,10,10,0" />
+                        <TextBlock Text="{Binding WiFiStrengthPercentage}" Margin="120,10,10,0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/refresh (Freepik).png" Width="16" Height="16" />
@@ -134,7 +133,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/bean temperature(Pixel perfect).png" Width="32" Height="32" />
-                        <TextBlock Text="210 C" Margin="120,10,10,0" />
+                        <TextBlock Text="{Binding BeanTemperature}" Margin="120,10,10,0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/refresh (Freepik).png" Width="16" Height="16" />
@@ -151,7 +150,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/heater (Smashicons).png" Width="32" Height="32" />
-                        <TextBlock Text="On" Margin="120,10,10,0" />
+                        <TextBlock Text="{Binding HeaterStatus}" Margin="120,10,10,0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/refresh (Freepik).png" Width="16" Height="16" />
@@ -168,7 +167,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/progress (Freepik).png" Width="32" Height="32" />
-                        <TextBlock Text="100%" Margin="120,10,10,0" />
+                        <TextBlock Text="{Binding ProgressPercentage}" Margin="120,10,10,0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/refresh (Freepik).png" Width="16" Height="16" />
@@ -179,8 +178,18 @@
             </Border>
         </StackPanel>
 
-        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25">
-            <StackPanel>
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25" Visibility="Visible">
+            <StackPanel Margin="5">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel>
+                    </StackPanel>
+                    <StackPanel></StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25" Visibility="Hidden">
+            <StackPanel Visibility="Hidden">
                 <TextBlock Text="Report Details" FontWeight="Bold" FontSize="16" Margin="5" />
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Margin="5">
@@ -250,7 +259,7 @@
 
                     <StackPanel Margin="5">
                         <TextBlock Text="Notes" FontWeight="Bold" FontSize="12" Margin="5" />
-                        <TextBox Text="Enter roast notes here" FontStyle="Italic" Width="300" Height="170" Margin="5" />
+                        <TextBox Text="Enter roast notes here" TextWrapping="Wrap" FontStyle="Italic" Width="300" Height="170" Margin="5" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

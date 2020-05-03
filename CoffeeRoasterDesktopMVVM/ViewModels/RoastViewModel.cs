@@ -27,6 +27,8 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public ICommand LoadProfileCommand { get; }
         public ICommand SendProfileToRoasterCommand { get; }
         public ICommand VerifyProfileCommand { get; }
+        public ICommand SaveReportCommand { get; }
+        public ICommand LoadReportCommand { get; }
         public ProfileService ProfileService { get; }
         public WpfPlot RoastPlot { get; set; }
         public RoastProfile RoastProfile { get; }
@@ -34,11 +36,20 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public int CurrentTime { get; private set; }
         public bool CanStartRoast { get; private set; }
         public bool ProfileIsValid { get; private set; }
-        public string ProfileName { get; private set; }
+
+        public string WiFiStrengthPercentage { get; set; }
         public string WiFiLastUpdated { get; private set; }
+
+        public string BeanTemperature { get; private set; }
         public string TemperatureLastUpdated { get; private set; }
+
+        public string ProgressPercentage { get; private set; }
         public string ProgressLastUpdated { get; private set; }
-        public string HeaterStatusLastUpdate { get; set; }
+
+        public string HeaterStatus { get; private set; }
+        public string HeaterStatusLastUpdate { get; private set; }
+
+        public string FirstCrackTimeStampSeconds { get; private set; }
 
         private readonly IDisposable messageSubscription;
 
@@ -65,21 +76,29 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             RoastProfile = new RoastProfile();
             RoastProfile = ProfileService.LoadProfile(@"C:\Users\Tom - Software Dev\Documents\testProfile.json");
             roastPoints = RoastProfile.RoastPoints;
-            ProfileName = RoastProfile.RoastName;
             dataLogger = new DataLogger();
             data = new double[RoastProfile.RoastLengthTotalInSeconds];
             timeIntervals = new double[RoastProfile.RoastLengthTotalInSeconds];
             UpdateRoastPlotPoints();
+
             StartRoastCommand = new DelegateCommand(StartRoast);
             StopRoastCommand = new DelegateCommand(StopRoast);
             LoadProfileCommand = new DelegateCommand(LoadProfileFromFile);
             SendProfileToRoasterCommand = new DelegateCommand(SendProfile);
             VerifyProfileCommand = new DelegateCommand(GetProfile);
+            SaveReportCommand = new DelegateCommand(SaveReport);
+            LoadReportCommand = new DelegateCommand(LoadReport);
+
             // todo remove this, testing and dev only
+            BeanTemperature = $"{210} °C";
             TemperatureLastUpdated = "10 seconds ago";
+            WiFiStrengthPercentage = $"{90} %";
             WiFiLastUpdated = $"180 seconds ago";
             ProgressLastUpdated = "5 seconds ago";
+            HeaterStatus = "On";
             HeaterStatusLastUpdate = "25 seconds ago";
+            FirstCrackTimeStampSeconds = $"{100} s";
+            ProgressPercentage = $"{95} %";
 
             messageSubscription = new CompositeDisposable()
             {
@@ -94,6 +113,14 @@ namespace CoffeeRoasterDesktopUI.ViewModels
                 timeIntervals[i] = i;
             }
             InitialisePlot();
+        }
+
+        private void LoadReport()
+        {
+        }
+
+        private void SaveReport()
+        {
         }
 
         private void LoadProfileFromFile()
