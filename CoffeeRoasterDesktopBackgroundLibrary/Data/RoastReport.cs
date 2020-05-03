@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace CoffeeRoasterDesktopBackgroundLibrary.Data
 {
-    public class RoastReport
+    public class RoastReport : INotifyPropertyChanged
     {
         public Guid Id { get; } = Guid.NewGuid();
         public string Name { get; set; }
@@ -18,7 +19,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.Data
         public int RecordedRR { get; set; }
         public int FirstCrackSeconds { get; set; }
         public int RoastTime { get; set; }
-        public int BatchWeightRoaster { get; set; }
+        public int BatchWeightRoasted { get; set; }
         public string PhotoOneFileLocation { get; set; }
         public string PhotoTwoFileLocation { get; set; }
         public string PhotoThreeFileLocation { get; set; }
@@ -26,5 +27,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.Data
 
         [StringLength(500, ErrorMessage = "The {0} value cannot exceed {1} characters. ")]
         public string Notes { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -34,6 +34,22 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
             }
         }
 
+        public IEnumerable<RoastReport> GetAllReports()
+        {
+            try
+            {
+                using (var db = new LiteDatabase(configuration.LogFileDatabaseDirectory))
+                {
+                    var roastReport = db.GetCollection<RoastReport>("roastReport");
+                    return roastReport.Query().ToList();
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public RoastReport LoadReportFromDB(Guid roastId)
         {
             try

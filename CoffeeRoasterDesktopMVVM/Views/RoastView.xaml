@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:CoffeeRoasterDesktopUI.Views"
              xmlns:styles="clr-namespace:CoffeeRoasterDesktopUI.Styles"
              xmlns:ScottPlot="clr-namespace:ScottPlot;assembly=ScottPlot.WPF"
+             xmlns:vm="clr-namespace:CoffeeRoasterDesktopUI.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="1080" d:DesignWidth="1920" Background="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}" BorderBrush="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}">
     <Grid>
@@ -19,6 +20,7 @@
             <Style TargetType="Button">
                 <Setter Property="Background" Value="White" />
             </Style>
+            <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -178,67 +180,70 @@
             </Border>
         </StackPanel>
 
-        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25" Visibility="Visible">
+        <!--<Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25" Visibility="{Binding LoadRoastReportWindowOpen, Converter={StaticResource VisibleIfTrueConverter}}">-->
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25">
             <StackPanel Margin="5">
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel>
-                    </StackPanel>
+                    <Button Width="32" Height="32" BorderThickness="0" Margin="800,0,10,0" Command="{Binding CloseLoadWindowCommand}">
+                        <Image Source="/Resources/close (Those Icons).png" />
+                    </Button>
+
                     <StackPanel></StackPanel>
                 </StackPanel>
             </StackPanel>
         </Border>
-
-        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25" Visibility="Hidden">
-            <StackPanel Visibility="Hidden">
+        <!--Visibility="{Binding Path=!LoadRoastReportWindowOpen, Converter={StaticResource VisibleIfTrueConverter}}"-->
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25" Visibility="{Binding SaveRoastWindowEnabled, Converter={StaticResource VisibleIfTrueConverter}}">
+            <StackPanel>
                 <TextBlock Text="Report Details" FontWeight="Bold" FontSize="16" Margin="5" />
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Margin="5">
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Name" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.Name}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Batch No." FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.BatchNumber}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Roast Type" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.RoastType}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Bean Variety" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.BeanVariety}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Batch weight (raw)" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.BatchWeightRaw}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Ambient Temperature" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.AmbientTemperatureCelcius}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Humidity" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.HumidityPercentage}"  Width="100" FontSize="12" />
                         </StackPanel>
                     </StackPanel>
 
                     <StackPanel Margin="5">
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Actual RR" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.RecordedRR}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="First Crack (s)" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.FirstCrackSeconds}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Roast Time (s)" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.RoastTime}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
                             <TextBlock Text="Final weight (roasted)" FontWeight="Bold" FontSize="12" Width="150" />
-                            <TextBox Text=""  Width="100" FontSize="12" />
+                            <TextBox Text="{Binding RoastReport.BatchWeightRoasted}"  Width="100" FontSize="12" />
                         </StackPanel>
                         <TextBlock Text="Photos" Margin="5" FontWeight="Bold" FontSize="12" />
                         <StackPanel Orientation="Horizontal" Margin="10">

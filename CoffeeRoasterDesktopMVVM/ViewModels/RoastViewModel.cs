@@ -29,6 +29,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public ICommand VerifyProfileCommand { get; }
         public ICommand SaveReportCommand { get; }
         public ICommand LoadReportCommand { get; }
+        public ICommand CloseLoadWindowCommand { get; }
         public ProfileService ProfileService { get; }
         public WpfPlot RoastPlot { get; set; }
         public RoastProfile RoastProfile { get; }
@@ -36,6 +37,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public int CurrentTime { get; private set; }
         public bool CanStartRoast { get; private set; }
         public bool ProfileIsValid { get; private set; }
+        public bool SaveRoastWindowEnabled { get; private set; } = true;
+
+        public RoastReport RoastReport { get; set; }
 
         public string WiFiStrengthPercentage { get; set; }
         public string WiFiLastUpdated { get; private set; }
@@ -68,6 +72,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly DataLogger dataLogger;
+        private readonly ReportService reportService;
 
         public RoastViewModel(RoasterConnection roasterConnection)
         {
@@ -77,6 +82,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             RoastProfile = ProfileService.LoadProfile(@"C:\Users\Tom - Software Dev\Documents\testProfile.json");
             roastPoints = RoastProfile.RoastPoints;
             dataLogger = new DataLogger();
+            reportService = new ReportService();
+            RoastReport = new RoastReport();
+
             data = new double[RoastProfile.RoastLengthTotalInSeconds];
             timeIntervals = new double[RoastProfile.RoastLengthTotalInSeconds];
             UpdateRoastPlotPoints();
@@ -88,6 +96,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             VerifyProfileCommand = new DelegateCommand(GetProfile);
             SaveReportCommand = new DelegateCommand(SaveReport);
             LoadReportCommand = new DelegateCommand(LoadReport);
+            CloseLoadWindowCommand = new DelegateCommand(CloseLoadWindow);
 
             // todo remove this, testing and dev only
             BeanTemperature = $"{210} °C";
@@ -115,16 +124,25 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             InitialisePlot();
         }
 
+        private void CloseLoadWindow()
+        {
+            SaveRoastWindowEnabled = true;
+        }
+
         private void LoadReport()
         {
+            var reports = reportService.GetAllReports();
+            SaveRoastWindowEnabled = false;
         }
 
         private void SaveReport()
         {
+            reportService.SaveReportToDB(RoastReport);
         }
 
         private void LoadProfileFromFile()
         {
+            //var allReports = reportService.GetAllReports();
         }
 
         private void StopRoast()
