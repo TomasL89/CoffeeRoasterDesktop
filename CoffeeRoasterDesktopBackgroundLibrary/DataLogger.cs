@@ -50,13 +50,6 @@
             var roastLog = db.GetCollection<RoastLog>("roastlogs");
 
             var results = roastLog.Query().Where(x => x.RoastId == roastId).ToList();
-
-            Debug.WriteLine("TimeStamp _ Temperature _ Roast Time(s) _Heater On");
-            foreach (var row in results)
-            {
-                // todo delete once done with testing
-                Debug.WriteLine($"{row.TimeStamp} {row.Temperature} _ {row.RoastDurationSecond} _ {row.HeaterOn}");
-            }
         }
     }
 }

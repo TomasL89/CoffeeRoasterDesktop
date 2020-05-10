@@ -1,6 +1,7 @@
 ﻿using CoffeeRoasterDesktopBackgroundLibrary;
 using CoffeeRoasterDesktopBackgroundLibrary.Data;
 using Messages;
+using Microsoft.Win32;
 using Prism.Commands;
 using ScottPlot;
 using System;
@@ -10,6 +11,8 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -32,7 +35,10 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public ICommand CloseLoadWindowCommand { get; }
         public ProfileService ProfileService { get; }
         public WpfPlot RoastPlot { get; set; }
-        public RoastProfile RoastProfile { get; }
+
+        private string profileLocation;
+
+        public RoastProfile RoastProfile { get; private set; }
         public int CurrentTemperature { get; private set; }
         public int CurrentTime { get; private set; }
         public bool CanStartRoast { get; private set; }
@@ -67,12 +73,17 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         private readonly double[] data;
         private readonly double[] timeIntervals;
         private readonly List<Tuple<double, double>> temperaturePlotPoints = new List<Tuple<double, double>>();
-        private readonly List<RoastPoint> roastPoints = new List<RoastPoint>();
+        private List<RoastPoint> roastPoints = new List<RoastPoint>();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly DataLogger dataLogger;
         private readonly ReportService reportService;
+
+        private DateTime wifiLastUpdate;
+        private DateTime temperatureLastUpdate;
+        private DateTime progressLastUpdate;
+        private DateTime heaterStatusLastUpdate;
 
         public RoastViewModel(RoasterConnection roasterConnection)
         {
@@ -98,21 +109,10 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             LoadReportCommand = new DelegateCommand(LoadReport);
             CloseLoadWindowCommand = new DelegateCommand(CloseLoadWindow);
 
-            // todo remove this, testing and dev only
-            BeanTemperature = $"{210} °C";
-            TemperatureLastUpdated = "10 seconds ago";
-            WiFiStrengthPercentage = $"{90} %";
-            WiFiLastUpdated = $"180 seconds ago";
-            ProgressLastUpdated = "5 seconds ago";
-            HeaterStatus = "On";
-            HeaterStatusLastUpdate = "25 seconds ago";
-            FirstCrackTimeStampSeconds = $"{100} s";
-            ProgressPercentage = $"{95} %";
-
             messageSubscription = new CompositeDisposable()
             {
                 roasterConnection.MessageRecieved.ObserveOnDispatcher().Do(UpdateData).Subscribe(),
-                roasterConnection.WiFiConnected.ObserveOnDispatcher().Do(UpdateConnectionStatus).Subscribe()
+                roasterConnection.WifiConnectionChanged.ObserveOnDispatcher().Do(UpdateConnectionStatus).Subscribe()
             };
 
             //roasterConnection.ConnectToDevice();
@@ -142,6 +142,24 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void LoadProfileFromFile()
         {
+            var ofd = new System.Windows.Forms.OpenFileDialog
+            {
+                Filter = "Profile (*.json)|*.json",
+                DefaultExt = ".json"
+            };
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                var roastProfile = ProfileService.LoadProfile(ofd.FileName);
+                if (roastProfile != null)
+                {
+                    profileLocation = ofd.FileName;
+                    RoastProfile = roastProfile;
+                    roastPoints = RoastProfile.RoastPoints;
+                    UpdateRoastPlotPoints();
+                    InitialisePlot();
+                }
+            }
             //var allReports = reportService.GetAllReports();
         }
 
@@ -157,8 +175,16 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void GetProfile()
         {
-            ProfileIsValid = ProfileIsValid ? false : true;
-            // roasterConnection.SendMessageToDevice("Profile Get");
+            var reply = roasterConnection.SendMessageToDeviceWithReply("Profile Get");
+            var profileFromDevice = ProfileService.ValidateRoastProfileAndDecode(reply);
+            if (profileFromDevice != null)
+            {
+                RoastProfile = profileFromDevice;
+                ProfileIsValid = true;
+                roastPoints = RoastProfile.RoastPoints;
+                UpdateRoastPlotPoints();
+                InitialisePlot();
+            }
         }
 
         private void SendProfile()
@@ -166,10 +192,15 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             // todo this shouldn't be here, the timeouts and should be in the connection
             try
             {
+                var profileMessage = ProfileService.GetProfileAsString(profileLocation);
+
+                if (string.IsNullOrWhiteSpace(profileMessage))
+                    return;
+
+                var strippedProfileMessage = profileMessage.Replace("\r", "").Replace("\n", "");
                 for (var i = 0; i < PROFILE_ATTEMPT_LIMIT; i++)
                 {
-                    var profileMessage = ProfileService.GetProfileAsString(@"C:\Users\Tom - Software Dev\Documents\testProfile.json");
-                    var result = roasterConnection.SendMessageToDeviceWithReply(@profileMessage + '\n');
+                    var result = roasterConnection.SendMessageToDeviceWithReply(strippedProfileMessage + '\n');
                     if (result == null)
                         continue;
 
@@ -250,10 +281,13 @@ namespace CoffeeRoasterDesktopUI.ViewModels
                 {
                     Temperature = temperatureMessage.Temperature,
                     TimeStamp = DateTime.UtcNow,
-                    HeaterOn = false, //need to change
+                    HeaterOn = temperatureMessage.HeaterOn,
                     RoastDurationSecond = temperatureMessage.TimeInSeconds,
                     RoastId = roastId
                 });
+                BeanTemperature = $"{temperatureMessage.Temperature}  °C";
+                ProgressPercentage = temperatureMessage.RoastProgress.ToString("0.00%");
+                HeaterStatus = temperatureMessage.HeaterOn ? "On" : "Off";
 
                 UpdatePlot();
             }

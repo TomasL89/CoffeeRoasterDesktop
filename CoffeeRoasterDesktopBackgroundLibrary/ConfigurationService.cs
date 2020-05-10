@@ -56,7 +56,6 @@ namespace CoffeeRoasterDesktopBackground
             {
                 var configurationFile = File.ReadAllText(configurationLocation);
                 SystemConfiguration = JsonConvert.DeserializeObject<Configuration>(configurationFile);
-                //SystemConfiguration =  await JsonSerializer.DeserializeAsync<Configuration>(configurationFile);
             }
             catch (Exception)
             {

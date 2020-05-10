@@ -10,19 +10,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 {
     public class RoasterConnection
     {
-        public IObservable<bool> WiFiConnected => wiFiConnectedSubject;
-        public IObservable<IMessage> MessageRecieved => messageRecievedSubject;
-
-        private readonly Subject<IMessage> messageRecievedSubject = new Subject<IMessage>();
-        private readonly Subject<bool> wiFiConnectedSubject = new Subject<bool>();
-
-        private SimpleTcpClient client;
-        public Configuration Configuration { get; set; }
-
-        private readonly ConfigurationService configurationService;
-        private string lastMessageReceived;
-
-        public RoasterConnection()
+        private RoasterConnection()
         {
             configurationService = new ConfigurationService();
             Configuration = configurationService.SystemConfiguration;
@@ -32,15 +20,47 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
             client.DataReceived += Client_DataReceived;
             client.DelimiterDataReceived += Client_DelimiterDataReceived;
 
-            var task = new Task(() =>
-            {
-                client.DataReceived += Client_DataReceived;
-                for (; ; )
-                { }
-            });
-
-            task.Start();
+            //var task = new Task(() =>
+            //{
+            //    //  client.DataReceived += Client_DataReceived;
+            //    for (; ; )
+            //    { }
+            //});
+            //task.Start();
+            Connect();
         }
+
+        private static RoasterConnection instance;
+
+        private static readonly object _lock = new object();
+
+        public static RoasterConnection GetConnectionInstance()
+        {
+            if (instance == null)
+            {
+                lock (_lock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new RoasterConnection();
+                    }
+                }
+            }
+
+            return instance;
+        }
+
+        public IObservable<bool> WifiConnectionChanged => wiFiConnectedSubject;
+        public IObservable<IMessage> MessageRecieved => messageRecievedSubject;
+
+        private readonly Subject<IMessage> messageRecievedSubject = new Subject<IMessage>();
+        private readonly Subject<bool> wiFiConnectedSubject = new Subject<bool>();
+
+        private SimpleTcpClient client;
+        public Configuration Configuration { get; set; }
+        public bool Connected { get; private set; }
+        private readonly ConfigurationService configurationService;
+        private string lastMessageReceived;
 
         private void Client_DelimiterDataReceived(object sender, Message e)
         {
@@ -61,10 +81,12 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 
         private void Connect()
         {
+            Connected = false;
             try
             {
                 client.Connect(Configuration.IpAddress, Configuration.PortNumber);
                 wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
+                Connected = true;
             }
             catch (Exception)
             {
@@ -92,8 +114,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 
         public string SendMessageToDeviceWithReply(string message)
         {
-            var result = string.Empty;
-            result = client.WriteLineAndGetReply(message, TimeSpan.FromSeconds(5)).MessageString;
+            var result = client?.WriteLineAndGetReply(message, TimeSpan.FromSeconds(5))?.MessageString;
             return result;
         }
 
@@ -142,11 +163,15 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
         {
             int.TryParse(messageData[1], out int temperature);
             int.TryParse(messageData[2], out int timeInSeconds);
+            bool.TryParse(messageData[3], out bool heaterOn);
+            float.TryParse(messageData[4], out float percentageComplete);
 
             messageRecievedSubject.OnNext(new TemperatureMessage()
             {
                 Temperature = temperature,
-                TimeInSeconds = timeInSeconds
+                TimeInSeconds = timeInSeconds,
+                HeaterOn = heaterOn,
+                RoastProgress = percentageComplete
             });
         }
     }

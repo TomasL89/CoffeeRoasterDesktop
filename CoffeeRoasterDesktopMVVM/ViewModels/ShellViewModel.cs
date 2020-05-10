@@ -15,11 +15,9 @@ namespace CoffeeRoasterDesktopMVVM.ViewModels
 
         public ShellViewModel()
         {
-            roasterConnection = new RoasterConnection();
-
             try
             {
-                roasterConnection.ConnectToDevice();
+                roasterConnection = RoasterConnection.GetConnectionInstance();
             }
             catch (Exception)
             {

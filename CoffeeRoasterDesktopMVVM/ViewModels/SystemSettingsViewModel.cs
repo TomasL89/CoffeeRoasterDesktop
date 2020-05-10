@@ -3,6 +3,7 @@ using CoffeeRoasterDesktopBackgroundLibrary;
 using Prism.Commands;
 using System;
 using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Windows.Input;
 
 namespace CoffeeRoasterDesktopUI.ViewModels
@@ -24,17 +25,16 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private readonly ConfigurationService configurationService;
 
+        private readonly IDisposable roasterConnectionSubscription;
+
         public SystemSettingsViewModel(RoasterConnection roasterConnection)
         {
-            if (roasterConnection is null)
-            {
-                // todo flag user to connect
-            }
-
+            roasterConnectionSubscription = roasterConnection.WifiConnectionChanged.ObserveOnDispatcher().Subscribe(UpdateConncectionStatus);
             configurationService = new ConfigurationService();
             GetConfigurationData();
             PropertyChanged += SystemSettingsViewModel_PropertyChanged;
             OnWifiConnectPressed = new DelegateCommand(ConnectoToRoaster);
+            UpdateConncectionStatus(roasterConnection.Connected);
         }
 
         private void UpdateConncectionStatus(bool connected)
@@ -71,6 +71,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         public void Dispose()
         {
+            roasterConnectionSubscription.Dispose();
         }
     }
 }
