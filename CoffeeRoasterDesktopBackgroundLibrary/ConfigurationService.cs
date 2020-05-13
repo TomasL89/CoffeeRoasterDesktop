@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CoffeeRoasterDesktopBackgroundLibrary.Error;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 
@@ -12,8 +13,6 @@ namespace CoffeeRoasterDesktopBackground
         private readonly string directory;
         private readonly JsonSerializer jsonSerializer;
 
-        //todo system configuration changed event
-
         public ConfigurationService()
         {
             jsonSerializer = new JsonSerializer();
@@ -21,7 +20,6 @@ namespace CoffeeRoasterDesktopBackground
             configurationLocation = Path.Combine(directory, "system.cfg");
             if (!File.Exists(configurationLocation))
             {
-                // warn user to create a new configuration??
                 var validConfiguraiton = CreateNewDefaultConfiguration();
                 SystemConfiguration = validConfiguraiton ?? throw new Exception("Error with configuration, please log issue");
 
@@ -37,7 +35,8 @@ namespace CoffeeRoasterDesktopBackground
             {
                 IpAddress = "192.168.0.0",
                 PortNumber = 8180,
-                LogFileDatabaseDirectory = Path.Combine(directory, "roast.db")
+                LogFileDatabaseDirectory = Path.Combine(directory, "roast.db"),
+                ErrorLogFileLocation = Path.Combine(directory, "log.txt")
             };
 
             var couldSaveNewConfiguraiton = SaveConfiguration(configuration);
@@ -46,6 +45,8 @@ namespace CoffeeRoasterDesktopBackground
             {
                 return configuration;
             }
+
+            ErrorService.LogError(SeverityLevel.Error, ErrorType.Configuration, $"Class {typeof(ConfigurationService)} failed when attempting to create a configuration at {directory}.\n");
 
             return null;
         }
@@ -57,9 +58,10 @@ namespace CoffeeRoasterDesktopBackground
                 var configurationFile = File.ReadAllText(configurationLocation);
                 SystemConfiguration = JsonConvert.DeserializeObject<Configuration>(configurationFile);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // todo see how well this works
+                ErrorService.LogError(SeverityLevel.Debug, ErrorType.Configuration, $"Class {typeof(ConfigurationService)} failed when attempting to load the system configuraiton from {configurationLocation}.\n", ex);
+
                 return new Configuration();
             }
 
@@ -74,9 +76,10 @@ namespace CoffeeRoasterDesktopBackground
                 using var writer = new JsonTextWriter(sw);
                 jsonSerializer.Serialize(writer, configuration);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // todo handle exceptions here, display a warning message
+                ErrorService.LogError(SeverityLevel.Error, ErrorType.Configuration, $"Class {typeof(ConfigurationService)} failed when attempting to save the system configuraiton from {configurationLocation}.\n", ex);
+
                 return false;
             }
 

@@ -12,7 +12,7 @@
              d:DesignHeight="450" d:DesignWidth="1920" MinHeight="1080" MinWidth="1920" Background="Black" BorderBrush="Black" BorderThickness="0">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="White" />
         </Style>
         <Style x:Key="StackPanelMaxWidth" TargetType="StackPanel">
             <Setter Property="Width" Value="1920" />

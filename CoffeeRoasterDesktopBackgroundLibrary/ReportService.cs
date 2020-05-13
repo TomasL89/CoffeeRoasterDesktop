@@ -1,14 +1,16 @@
 ﻿using CoffeeRoasterDesktopBackground;
 using CoffeeRoasterDesktopBackgroundLibrary.Data;
+using CoffeeRoasterDesktopBackgroundLibrary.Error;
 using LiteDB;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CoffeeRoasterDesktopBackgroundLibrary
 {
     public class ReportService
     {
+        private const string ROAST_REPORT_TABLE_NAME = "roastreport";
+
         private readonly Configuration configuration;
         private readonly ConfigurationService configurationService;
 
@@ -19,18 +21,20 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
             configuration = configurationService.SystemConfiguration;
         }
 
-        public void SaveReportToDB(RoastReport roastReport)
+        public bool SaveReportToDB(RoastReport roastReport)
         {
             try
             {
-                using (var db = new LiteDatabase(configuration.LogFileDatabaseDirectory))
-                {
-                    var roastTable = db.GetCollection<RoastReport>("roastReport");
-                    roastTable.Insert(roastReport);
-                }
+                using var db = new LiteDatabase(configuration.LogFileDatabaseDirectory);
+                var roastTable = db.GetCollection<RoastReport>(ROAST_REPORT_TABLE_NAME);
+                roastTable.Insert(roastReport);
+
+                return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ErrorService.LogError(SeverityLevel.Error, ErrorType.Database, $"Class {typeof(ReportService)} failed when attempting to create a roast report in table {ROAST_REPORT_TABLE_NAME}.\n    Log file database location:\n       {configuration.LogFileDatabaseDirectory}", ex);
+                return false;
             }
         }
 
@@ -38,14 +42,14 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
         {
             try
             {
-                using (var db = new LiteDatabase(configuration.LogFileDatabaseDirectory))
-                {
-                    var roastReport = db.GetCollection<RoastReport>("roastReport");
-                    return roastReport.Query().ToList();
-                }
+                using var db = new LiteDatabase(configuration.LogFileDatabaseDirectory);
+                var roastReport = db.GetCollection<RoastReport>(ROAST_REPORT_TABLE_NAME);
+
+                return roastReport.Query().ToList();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ErrorService.LogError(SeverityLevel.Error, ErrorType.Database, $"Class {typeof(ReportService)} failed when attempting to obtain all reports from {ROAST_REPORT_TABLE_NAME}.\n    Log file database location:\n       {configuration.LogFileDatabaseDirectory}", ex);
                 return null;
             }
         }
@@ -55,13 +59,14 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
             try
             {
                 using var db = new LiteDatabase(configuration.LogFileDatabaseDirectory);
-                var roastLog = db.GetCollection<RoastReport>("roastReport");
+                var roastLog = db.GetCollection<RoastReport>(ROAST_REPORT_TABLE_NAME);
 
                 var result = roastLog.Query().Where(x => x.Id == roastId).SingleOrDefault();
                 return result;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ErrorService.LogError(SeverityLevel.Error, ErrorType.Database, $"Class {typeof(ReportService)} failed when attempting to load a report with ID {roastId} .\n    Log file database location:\n       {configuration.LogFileDatabaseDirectory}", ex);
                 return null;
             }
         }

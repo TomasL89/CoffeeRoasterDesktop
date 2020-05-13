@@ -1,4 +1,5 @@
 ﻿using CoffeeRoasterDesktopBackgroundLibrary;
+using CoffeeRoasterDesktopBackgroundLibrary.RoastProfile;
 using System.ComponentModel;
 using System.Windows.Media;
 

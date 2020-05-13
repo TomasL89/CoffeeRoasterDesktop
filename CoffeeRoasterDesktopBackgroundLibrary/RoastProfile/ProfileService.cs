@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
 
-namespace CoffeeRoasterDesktopBackgroundLibrary
+namespace CoffeeRoasterDesktopBackgroundLibrary.RoastProfile
 {
     public class ProfileService
     {
@@ -30,15 +30,23 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
             return roastProfile;
         }
 
-        public void SaveProfile(string fileLocation, RoastProfile roastProfile)
+        public bool SaveProfile(string fileLocation, RoastProfile roastProfile)
         {
+            if (!File.Exists(fileLocation))
+                return false;
+
             using var sw = new StreamWriter(fileLocation);
             using var writer = new JsonTextWriter(sw);
             jsonSerializer.Serialize(writer, roastProfile);
+
+            return true;
         }
 
         public RoastProfile LoadProfile(string fileLocation)
         {
+            if (!File.Exists(fileLocation))
+                return null;
+
             var profile = File.ReadAllText(fileLocation);
             return JsonConvert.DeserializeObject<RoastProfile>(profile);
         }
@@ -55,6 +63,9 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 
         public RoastProfile LoadProfileFromMessage(string message)
         {
+            if (string.IsNullOrWhiteSpace(message))
+                return null;
+
             return JsonConvert.DeserializeObject<RoastProfile>(message);
         }
     }

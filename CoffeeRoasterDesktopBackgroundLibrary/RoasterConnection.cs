@@ -4,35 +4,37 @@ using SimpleTCP;
 using System;
 using System.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CoffeeRoasterDesktopBackgroundLibrary
 {
     public class RoasterConnection
     {
+        private readonly ConfigurationService configurationService;
+        private string lastMessageReceived;
+        private SimpleTcpClient client;
+
+        private readonly Subject<IMessage> messageRecievedSubject = new Subject<IMessage>();
+        private readonly Subject<bool> wiFiConnectedSubject = new Subject<bool>();
+
+        private static RoasterConnection instance;
+        private static readonly object _lock = new object();
+
+        public IObservable<bool> WifiConnectionChanged => wiFiConnectedSubject;
+        public IObservable<IMessage> MessageRecieved => messageRecievedSubject;
+        public Configuration Configuration { get; set; }
+        public bool Connected { get; private set; }
+
         private RoasterConnection()
         {
             configurationService = new ConfigurationService();
             Configuration = configurationService.SystemConfiguration;
-            //client = new SimpleTcpClient();
             client = new SimpleTcpClient();
-
             client.DataReceived += Client_DataReceived;
-            client.DelimiterDataReceived += Client_DelimiterDataReceived;
 
-            //var task = new Task(() =>
-            //{
-            //    //  client.DataReceived += Client_DataReceived;
-            //    for (; ; )
-            //    { }
-            //});
-            //task.Start();
             Connect();
         }
-
-        private static RoasterConnection instance;
-
-        private static readonly object _lock = new object();
 
         public static RoasterConnection GetConnectionInstance()
         {
@@ -50,22 +52,6 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
             return instance;
         }
 
-        public IObservable<bool> WifiConnectionChanged => wiFiConnectedSubject;
-        public IObservable<IMessage> MessageRecieved => messageRecievedSubject;
-
-        private readonly Subject<IMessage> messageRecievedSubject = new Subject<IMessage>();
-        private readonly Subject<bool> wiFiConnectedSubject = new Subject<bool>();
-
-        private SimpleTcpClient client;
-        public Configuration Configuration { get; set; }
-        public bool Connected { get; private set; }
-        private readonly ConfigurationService configurationService;
-        private string lastMessageReceived;
-
-        private void Client_DelimiterDataReceived(object sender, Message e)
-        {
-        }
-
         public bool UpdateConfiguration(string ipAddress, int portNumber)
         {
             Configuration.IpAddress = ipAddress;
@@ -77,21 +63,6 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
         public void ConnectToDevice()
         {
             Connect();
-        }
-
-        private void Connect()
-        {
-            Connected = false;
-            try
-            {
-                client.Connect(Configuration.IpAddress, Configuration.PortNumber);
-                wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
-                Connected = true;
-            }
-            catch (Exception)
-            {
-                wiFiConnectedSubject.OnNext(false);
-            }
         }
 
         public void StartRoast()
@@ -108,8 +79,30 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
         {
             if (client.TcpClient.Connected)
                 client.WriteLine(message);
+        }
 
-            // if (client.TcpClient != null)
+        public void SendProfileToRoaster(string profileMessage, int attempts)
+        {
+            if (string.IsNullOrWhiteSpace(profileMessage))
+                return;
+
+            var task = new Task(() =>
+            {
+                var strippedProfileMessage = profileMessage.Replace("\r", "").Replace("\n", "");
+                for (var i = 0; i < attempts; i++)
+                {
+                    var result = client?.WriteLineAndGetReply(strippedProfileMessage + '\n', TimeSpan.FromSeconds(5))?.MessageString;
+                    if (result == null)
+                        continue;
+
+                    if (string.Equals(result, "valid_profile", StringComparison.OrdinalIgnoreCase))
+                    {
+                        break;
+                    }
+                    Thread.Sleep(1000);
+                }
+            });
+            task.Start();
         }
 
         public string SendMessageToDeviceWithReply(string message)
@@ -148,6 +141,21 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
                         break;
                 }
                 lastMessageReceived = message;
+            }
+        }
+
+        private void Connect()
+        {
+            Connected = false;
+            try
+            {
+                client.Connect(Configuration.IpAddress, Configuration.PortNumber);
+                wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
+                Connected = true;
+            }
+            catch (Exception)
+            {
+                wiFiConnectedSubject.OnNext(false);
             }
         }
 

@@ -10,6 +10,8 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 {
     public class SystemSettingsViewModel : INotifyPropertyChanged, ITabViewModel, IDisposable
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public int IpOne { get; set; } = 192;
         public int IpTwo { get; set; } = 168;
         public int IpThree { get; set; } = 1;
@@ -20,8 +22,6 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public string ConnectionStatus { get; set; } = "Disconnected";
 
         public ICommand OnWifiConnectPressed { get; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly ConfigurationService configurationService;
 
