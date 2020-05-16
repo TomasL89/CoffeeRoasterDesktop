@@ -7,7 +7,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.Error
 {
     public static class ErrorService
     {
-        private static string logFileLocation = Path.Combine(Assembly.GetExecutingAssembly().Location, "log.txt");
+        private static string logFileLocation = Path.Combine(Assembly.GetEntryAssembly().Location, "log.txt");
 
         public static void LogError(SeverityLevel severityLevel, ErrorType errorType, string message, Exception exception = null)
         {

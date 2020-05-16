@@ -10,6 +10,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.Error
         Connection,
         Database,
         Configuration,
-        Profile
+        Profile,
+        Plot
     }
 }

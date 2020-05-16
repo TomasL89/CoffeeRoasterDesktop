@@ -1,16 +1,17 @@
 ﻿using CoffeeRoasterDesktopBackgroundLibrary;
 using CoffeeRoasterDesktopBackgroundLibrary.Data;
+using CoffeeRoasterDesktopBackgroundLibrary.Error;
 using CoffeeRoasterDesktopBackgroundLibrary.RoastProfile;
 using Messages;
 using Prism.Commands;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -20,13 +21,13 @@ namespace CoffeeRoasterDesktopUI.ViewModels
     public class RoastViewModel : ITabViewModel, INotifyPropertyChanged, IDisposable
     {
         private const int PROFILE_ATTEMPT_LIMIT = 5;
+        private const int MAX_ROAST_TIME = 1200;
 
         private string profileLocation;
         private int plotCounter = 0;
         private WpfPlot profilePlot;
-        private readonly int maxPoints = 900;
         private readonly RoasterConnection roasterConnection;
-        private readonly double[] data;
+        private double[] data;
         private readonly double[] timeIntervals;
         private List<Tuple<double, double>> temperaturePlotPoints = new List<Tuple<double, double>>();
         private List<RoastPoint> roastPoints = new List<RoastPoint>();
@@ -38,7 +39,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         private DateTime heaterStatusLastUpdate;
         private bool disposedValue = false; // To detect redundant calls
         private Guid roastId;
-
+        private RoastReport selectedRoastReport;
         private readonly IDisposable messageSubscription;
 
         public string Name { get; } = "Roast";
@@ -52,6 +53,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public ICommand SaveReportCommand { get; }
         public ICommand LoadReportCommand { get; }
         public ICommand CloseLoadWindowCommand { get; }
+        public ICommand DisplayPlotCommand { get; }
         public ProfileService ProfileService { get; }
         public WpfPlot RoastPlot { get; set; }
         public RoastProfile RoastProfile { get; private set; }
@@ -70,6 +72,11 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public string HeaterStatus { get; private set; }
         public string HeaterStatusLastUpdate { get; private set; }
         public string FirstCrackTimeStampSeconds { get; private set; }
+        public ObservableCollection<RoastReport> RoastReports { get; set; } = new ObservableCollection<RoastReport>();
+
+        public RoastReport SelectedRoastReport { get; set; }
+
+        public List<Tuple<double, double>> RoastReportLogData = new List<Tuple<double, double>>();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -83,9 +90,13 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             dataLogger = new DataLogger();
             reportService = new ReportService();
             RoastReport = new RoastReport();
+            data = new double[MAX_ROAST_TIME];
+            timeIntervals = new double[MAX_ROAST_TIME];
 
-            data = new double[RoastProfile.RoastLengthTotalInSeconds];
-            timeIntervals = new double[RoastProfile.RoastLengthTotalInSeconds];
+            for (var i = 0; i < MAX_ROAST_TIME; i++)
+            {
+                timeIntervals[i] = i;
+            }
             UpdateRoastPlotPoints();
 
             StartRoastCommand = new DelegateCommand(StartRoast);
@@ -96,18 +107,32 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             SaveReportCommand = new DelegateCommand(SaveReport);
             LoadReportCommand = new DelegateCommand(LoadReport);
             CloseLoadWindowCommand = new DelegateCommand(CloseLoadWindow);
+            DisplayPlotCommand = new DelegateCommand(LoadPlot);
 
             messageSubscription = new CompositeDisposable()
             {
                 roasterConnection.MessageRecieved.ObserveOnDispatcher().Do(UpdateData).Subscribe(),
                 roasterConnection.WifiConnectionChanged.ObserveOnDispatcher().Do(UpdateConnectionStatus).Subscribe()
             };
-
-            for (var i = 0; i < maxPoints; i++)
-            {
-                timeIntervals[i] = i;
-            }
             InitialisePlot();
+        }
+
+        private void LoadPlot()
+        {
+            var logData = dataLogger.GetRoastById(SelectedRoastReport.RoastPlotId);
+            if (logData.Count() == 0 || SelectedRoastReport.RoastPlotId == Guid.Empty)
+                return;
+            var temperatureLogData = logData.Select(x => x.Temperature).ToList();
+            plotCounter = temperatureLogData.Count;
+
+            for (var i = 0; i < plotCounter; i++)
+            {
+                if (i > MAX_ROAST_TIME)
+                    break;
+
+                data[i] = temperatureLogData[i];
+            }
+            UpdatePlot();
         }
 
         private void CloseLoadWindow()
@@ -118,11 +143,22 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         private void LoadReport()
         {
             var reports = reportService.GetAllReports();
+            if (reports == null)
+                return;
             SaveRoastWindowEnabled = false;
+            RoastReports = new ObservableCollection<RoastReport>(reports);
+            SelectedRoastReport = RoastReports.FirstOrDefault();
+
+            if (SelectedRoastReport != null)
+            {
+                LoadPlot();
+            }
+            RoastReport = SelectedRoastReport;
         }
 
         private void SaveReport()
         {
+            RoastReport.RoastPlotId = roastId;
             reportService.SaveReportToDB(RoastReport);
         }
 
@@ -163,6 +199,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         {
             var reply = roasterConnection.SendMessageToDeviceWithReply("Profile Get");
             var profileFromDevice = ProfileService.ValidateRoastProfileAndDecode(reply);
+            ProfileIsValid = true;
             if (profileFromDevice != null)
             {
                 RoastProfile = profileFromDevice;
@@ -206,7 +243,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         {
             if (obj is TemperatureMessage temperatureMessage)
             {
-                if (plotCounter >= maxPoints)
+                if (plotCounter >= temperaturePlotPoints.Count)
                     return;
                 data[plotCounter] = temperatureMessage.Temperature;
                 plotCounter += 1;
@@ -229,28 +266,37 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void UpdatePlot()
         {
-            RoastPlot.Dispatcher.Invoke(new Action(() =>
+            if (plotCounter > temperaturePlotPoints.Count)
+                return;
+            try
             {
-                var signalPlot = new WpfPlot();
-                signalPlot.plt.PlotSignal(data, maxRenderIndex: plotCounter, color: System.Drawing.Color.Green, lineWidth: 2);
-                RoastPlot.plt.Clear();
-                RoastPlot.plt.Add(signalPlot.plt.GetPlottables().First());
-                RoastPlot.plt.Add(profilePlot.plt.GetPlottables().First());
-                RoastPlot.plt.Axis(x1: 0, x2: 900, y1: 0, y2: 210);
-
-                foreach (var rp in roastPoints)
+                RoastPlot.Dispatcher.Invoke(new Action(() =>
                 {
-                    RoastPlot.plt.PlotText(rp.StageName, rp.EndSeconds + 1, rp.Temperature + 1, System.Drawing.Color.Black, fontName: null, 16);
-                }
+                    var signalPlot = new WpfPlot();
+                    signalPlot.plt.PlotSignal(data, maxRenderIndex: plotCounter, color: System.Drawing.Color.Green, lineWidth: 2);
+                    RoastPlot.plt.Clear();
+                    RoastPlot.plt.Add(signalPlot.plt.GetPlottables().First());
+                    RoastPlot.plt.Add(profilePlot.plt.GetPlottables().First());
+                    RoastPlot.plt.Axis(x1: 0, x2: MAX_ROAST_TIME, y1: 0, y2: 240);
 
-                RoastPlot.Render();
-            }));
+                    foreach (var rp in roastPoints)
+                    {
+                        RoastPlot.plt.PlotText(rp.StageName, rp.EndSeconds + 1, rp.Temperature + 1, System.Drawing.Color.Black, fontName: null, 16);
+                    }
+
+                    RoastPlot.Render();
+                }));
+            }
+            catch (Exception ex)
+            {
+                ErrorService.LogError(SeverityLevel.Error, ErrorType.Plot, $"Class {typeof(RoastViewModel)} failed to render correctly.\n", ex);
+            }
         }
 
         private void InitialisePlot()
         {
             RoastPlot = new WpfPlot();
-            RoastPlot.plt.Axis(x1: 0, x2: RoastProfile.RoastLengthTotalInSeconds, y1: 0, y2: 210);
+            RoastPlot.plt.Axis(x1: 0, x2: MAX_ROAST_TIME, y1: 0, y2: 240);
             var profileXs = temperaturePlotPoints.Select(x => x.Item1).ToArray();
             var profileYs = temperaturePlotPoints.Select(x => x.Item2).ToArray();
 
@@ -261,7 +307,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             var gg = ConvertToColor(Styles.PlotStyle.ColormindGrey);
             var tg = ConvertToColor(Styles.PlotStyle.ColormindOrange);
             profilePlot.plt.PlotScatter(profileXs, profileYs, markerShape: MarkerShape.none, color: System.Drawing.Color.Red, lineWidth: 2);
-            profilePlot.plt.Axis(x1: 0, x2: 900, y1: 0, y2: 210);
+            profilePlot.plt.Axis(x1: 0, x2: MAX_ROAST_TIME, y1: 0, y2: 240);
 
             RoastPlot.plt.Add(profilePlot.plt.GetPlottables().First());
             RoastPlot.plt.Style(null, bg, gg, tg);
@@ -271,6 +317,8 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             {
                 RoastPlot.plt.PlotText(rp.StageName, rp.EndSeconds + 1, rp.Temperature + 1, System.Drawing.Color.Black, fontName: null, 16);
             }
+
+            RoastPlot.plt.Ticks(useExponentialNotation: false, useMultiplierNotation: false);
 
             RoastPlot.Dispatcher.Invoke(new Action(() =>
             {

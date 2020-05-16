@@ -42,7 +42,7 @@
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Width="64" Height="64" BorderThickness="0" Background="White" Margin="0,0,10,0" Command="{Binding OnWifiConnectPressed}">
+            <Button Width="64" Height="64" BorderThickness="0" Background="White" Margin="0,0,10,0" Command="{Binding ConnectToWifiCommand}">
                 <Image Source="/Resources/wifi (Roundicons).png"></Image>
             </Button>
         </StackPanel>

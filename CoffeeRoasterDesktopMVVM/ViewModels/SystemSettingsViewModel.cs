@@ -21,11 +21,12 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public string ImageSource { get; } = "/Resources/interface (Freepik).png";
         public string ConnectionStatus { get; set; } = "Disconnected";
 
-        public ICommand OnWifiConnectPressed { get; }
+        public ICommand ConnectToWifiCommand { get; }
 
         private readonly ConfigurationService configurationService;
 
         private readonly IDisposable roasterConnectionSubscription;
+        private readonly RoasterConnection roasterConnection;
 
         public SystemSettingsViewModel(RoasterConnection roasterConnection)
         {
@@ -33,8 +34,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             configurationService = new ConfigurationService();
             GetConfigurationData();
             PropertyChanged += SystemSettingsViewModel_PropertyChanged;
-            OnWifiConnectPressed = new DelegateCommand(ConnectoToRoaster);
+            ConnectToWifiCommand = new DelegateCommand(ConnectoToRoaster);
             UpdateConncectionStatus(roasterConnection.Connected);
+            this.roasterConnection = roasterConnection;
         }
 
         private void UpdateConncectionStatus(bool connected)
@@ -51,6 +53,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             var ipaddress = $"{IpOne}.{IpTwo}.{IpThree}.{IpFour}";
 
             var couldUpdateConfiguration = configurationService.UpdateConfiguration(ipaddress, PortNumber);
+
+            if (couldUpdateConfiguration && !roasterConnection.Connected)
+                roasterConnection.ConnectToDevice();
         }
 
         private void GetConfigurationData()

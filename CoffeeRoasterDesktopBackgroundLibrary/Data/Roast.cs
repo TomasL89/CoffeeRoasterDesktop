@@ -4,7 +4,7 @@
 
     public class Roast
     {
-        public Guid RoastId { get; set; } = new Guid();
-        public DateTime Date { get; set; } = new DateTime().Date;
+        public Guid RoastId { get; set; } = Guid.NewGuid();
+        public DateTime Date { get; set; } = DateTime.Now.Date;
     }
 }

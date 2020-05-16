@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:CoffeeRoasterDesktopUI.Views"
              xmlns:styles="clr-namespace:CoffeeRoasterDesktopUI.Styles"
              xmlns:ScottPlot="clr-namespace:ScottPlot;assembly=ScottPlot.WPF"
-             xmlns:vm="clr-namespace:CoffeeRoasterDesktopUI.ViewModels"
+             xmlns:bgd ="clr-namespace:CoffeeRoasterDesktopBackgroundLibrary.Data;assembly=CoffeeRoasterDesktopBackgroundLibrary"
+             xmlns:vm ="clr-namespace:CoffeeRoasterDesktopUI.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="1080" d:DesignWidth="1920" Background="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}" BorderBrush="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}">
     <Grid>
@@ -182,15 +182,42 @@
 
         <!--<Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25" Visibility="{Binding LoadRoastReportWindowOpen, Converter={StaticResource VisibleIfTrueConverter}}">-->
         <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25">
-            <StackPanel Margin="5">
-                <StackPanel Orientation="Horizontal">
-                    <Button Width="32" Height="32" BorderThickness="0" Margin="800,0,10,0" Command="{Binding CloseLoadWindowCommand}">
-                        <Image Source="/Resources/close (Those Icons).png" />
-                    </Button>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height=".30*" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-                    <StackPanel></StackPanel>
+                <Button Grid.Column="1" Grid.Row="0" Width="32" Height="32" BorderThickness="0" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{Binding CloseLoadWindowCommand}">
+                    <Image Source="/Resources/close (Those Icons).png" />
+                </Button>
+
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Roasts" FontWeight="Bold" Margin="10" />
+
+                <ListBox Grid.Column="0" Grid.Row="1" Margin="10" ItemsSource="{Binding RoastReports}" SelectedItem="{Binding SelectedRoastReport}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Column="1" Grid.Row="1" Margin="5">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Name: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding SelectedRoastReport.Name}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Batch Number: " FontWeight="Bold" />
+                        <TextBlock Text="{Binding SelectedRoastReport.BatchNumber}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <Button Width="60" Height="30" Content="Load Graph" Command="{Binding DisplayPlotCommand}" />
                 </StackPanel>
-            </StackPanel>
+            </Grid>
         </Border>
         <!--Visibility="{Binding Path=!LoadRoastReportWindowOpen, Converter={StaticResource VisibleIfTrueConverter}}"-->
         <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" CornerRadius="10" Margin="5,25,15,25" Visibility="{Binding SaveRoastWindowEnabled, Converter={StaticResource VisibleIfTrueConverter}}">

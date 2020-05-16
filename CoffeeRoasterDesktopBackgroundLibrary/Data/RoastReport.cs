@@ -7,6 +7,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.Data
     public class RoastReport : INotifyPropertyChanged
     {
         public Guid Id { get; } = Guid.NewGuid();
+        public Guid RoastPlotId { get; set; }
         public string Name { get; set; }
         public int BatchNumber { get; set; }
         public string RoastType { get; set; }

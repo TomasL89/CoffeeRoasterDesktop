@@ -86,27 +86,39 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
             if (string.IsNullOrWhiteSpace(profileMessage))
                 return;
 
-            var task = new Task(() =>
-            {
-                var strippedProfileMessage = profileMessage.Replace("\r", "").Replace("\n", "");
-                for (var i = 0; i < attempts; i++)
-                {
-                    var result = client?.WriteLineAndGetReply(strippedProfileMessage + '\n', TimeSpan.FromSeconds(5))?.MessageString;
-                    if (result == null)
-                        continue;
+            if (!Connected)
+                return;
 
-                    if (string.Equals(result, "valid_profile", StringComparison.OrdinalIgnoreCase))
+            try
+            {
+                var task = new Task(() =>
+                {
+                    var strippedProfileMessage = profileMessage.Replace("\r", "").Replace("\n", "");
+                    for (var i = 0; i < attempts; i++)
                     {
-                        break;
+                        var result = client?.WriteLineAndGetReply(strippedProfileMessage + '\n', TimeSpan.FromSeconds(5))?.MessageString;
+                        if (result == null)
+                            continue;
+
+                        if (string.Equals(result, "valid_profile", StringComparison.OrdinalIgnoreCase))
+                        {
+                            break;
+                        }
+                        Thread.Sleep(1000);
                     }
-                    Thread.Sleep(1000);
-                }
-            });
-            task.Start();
+                });
+                task.Start();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public string SendMessageToDeviceWithReply(string message)
         {
+            if (!Connected)
+                return null;
+
             var result = client?.WriteLineAndGetReply(message, TimeSpan.FromSeconds(5))?.MessageString;
             return result;
         }
@@ -149,6 +161,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
             Connected = false;
             try
             {
+                Configuration = new ConfigurationService().LoadConfiguration();
                 client.Connect(Configuration.IpAddress, Configuration.PortNumber);
                 wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
                 Connected = true;
@@ -171,15 +184,15 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
         {
             int.TryParse(messageData[1], out int temperature);
             int.TryParse(messageData[2], out int timeInSeconds);
-            bool.TryParse(messageData[3], out bool heaterOn);
-            float.TryParse(messageData[4], out float percentageComplete);
+            //bool.TryParse(messageData[3], out bool heaterOn);
+            // float.TryParse(messageData[4], out float percentageComplete);
 
             messageRecievedSubject.OnNext(new TemperatureMessage()
             {
                 Temperature = temperature,
                 TimeInSeconds = timeInSeconds,
-                HeaterOn = heaterOn,
-                RoastProgress = percentageComplete
+                //HeaterOn = heaterOn,
+                // RoastProgress = percentageComplete
             });
         }
     }

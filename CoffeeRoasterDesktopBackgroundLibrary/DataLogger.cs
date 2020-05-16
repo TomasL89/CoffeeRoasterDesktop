@@ -29,7 +29,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
                 using var db = new LiteDatabase(configuration.LogFileDatabaseDirectory);
                 var roast = new Roast();
                 var roastTable = db.GetCollection<Roast>(ROAST_DATABASE_TABLE_NAME);
-                roastTable.Insert(new Roast());
+                roastTable.Insert(roast);
 
                 return roast.RoastId;
             }

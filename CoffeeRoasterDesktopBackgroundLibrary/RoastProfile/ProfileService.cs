@@ -17,17 +17,23 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.RoastProfile
             if (string.IsNullOrWhiteSpace(roastProfileFromDevice))
                 return null;
 
-            var roastProfile = JsonConvert.DeserializeObject<RoastProfile>(roastProfileFromDevice);
+            try
+            {
+                var roastProfile = JsonConvert.DeserializeObject<RoastProfile>(roastProfileFromDevice);
+                // Check for roast points
+                if (roastProfile.RoastPoints.Count < 1)
+                    return null;
 
-            // Check for roast points
-            if (roastProfile.RoastPoints.Count < 1)
+                // Check roast total length
+                if (roastProfile.RoastLengthTotalInSeconds <= 0)
+                    return null;
+
+                return roastProfile;
+            }
+            catch (System.Exception ex)
+            {
                 return null;
-
-            // Check roast total length
-            if (roastProfile.RoastLengthTotalInSeconds <= 0)
-                return null;
-
-            return roastProfile;
+            }
         }
 
         public bool SaveProfile(string fileLocation, RoastProfile roastProfile)
