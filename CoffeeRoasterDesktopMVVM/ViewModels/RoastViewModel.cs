@@ -2,6 +2,9 @@
 using CoffeeRoasterDesktopBackgroundLibrary.Data;
 using CoffeeRoasterDesktopBackgroundLibrary.Error;
 using CoffeeRoasterDesktopBackgroundLibrary.RoastProfile;
+using CoffeeRoasterDesktopUI.Helpers;
+using GalaSoft.MvvmLight.CommandWpf;
+using LiteDB;
 using Messages;
 using Prism.Commands;
 using ScottPlot;
@@ -15,6 +18,7 @@ using System.Reactive.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace CoffeeRoasterDesktopUI.ViewModels
 {
@@ -22,6 +26,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
     {
         private const int PROFILE_ATTEMPT_LIMIT = 5;
         private const int MAX_ROAST_TIME = 1200;
+        private const string DEFAULT_IMAGE_ICON = "/Resources/photo (Good Ware).png";
+        private const string DEFAULT_IMAGE_PREVIEW_ICON = "/Resources/warning (Freepik).png";
+        private const string VALID_IMAGE_PREVIEW_ICON = "/Resources/valid photo (Good Ware).png";
 
         private string profileLocation;
         private int plotCounter = 0;
@@ -39,7 +46,6 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         private DateTime heaterStatusLastUpdate;
         private bool disposedValue = false; // To detect redundant calls
         private Guid roastId;
-        private RoastReport selectedRoastReport;
         private readonly IDisposable messageSubscription;
 
         public string Name { get; } = "Roast";
@@ -53,7 +59,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public ICommand SaveReportCommand { get; }
         public ICommand LoadReportCommand { get; }
         public ICommand CloseLoadWindowCommand { get; }
-        public ICommand DisplayPlotCommand { get; }
+        public ICommand DisplayReportDetailsCommand { get; }
+        public ICommand AddImageCommand { get; }
+        public ICommand FirstCrackCommand { get; }
         public ProfileService ProfileService { get; }
         public WpfPlot RoastPlot { get; set; }
         public RoastProfile RoastProfile { get; private set; }
@@ -63,6 +71,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public bool ProfileIsValid { get; private set; }
         public bool SaveRoastWindowEnabled { get; private set; } = true;
         public RoastReport RoastReport { get; set; }
+        public ImageService ImageService { get; }
         public string WiFiStrengthPercentage { get; set; }
         public string WiFiLastUpdated { get; private set; }
         public string BeanTemperature { get; private set; }
@@ -73,6 +82,14 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public string HeaterStatusLastUpdate { get; private set; }
         public string FirstCrackTimeStampSeconds { get; private set; }
         public ObservableCollection<RoastReport> RoastReports { get; set; } = new ObservableCollection<RoastReport>();
+        public BitmapImage ImageOnePreview { get; private set; } = new BitmapImage(new Uri(DEFAULT_IMAGE_PREVIEW_ICON, UriKind.Relative));
+        public string ImageOneIcon { get; private set; } = DEFAULT_IMAGE_ICON;
+        public BitmapImage ImageTwoPreview { get; private set; } = new BitmapImage(new Uri(DEFAULT_IMAGE_PREVIEW_ICON, UriKind.Relative));
+        public string ImageTwoIcon { get; private set; } = DEFAULT_IMAGE_ICON;
+        public BitmapImage ImageThreePreview { get; private set; } = new BitmapImage(new Uri(DEFAULT_IMAGE_PREVIEW_ICON, UriKind.Relative));
+        public string ImageThreeIcon { get; private set; } = DEFAULT_IMAGE_ICON;
+        public BitmapImage ImageFourPreview { get; private set; } = new BitmapImage(new Uri(DEFAULT_IMAGE_PREVIEW_ICON, UriKind.Relative));
+        public string ImageFourIcon { get; private set; } = DEFAULT_IMAGE_ICON;
 
         public RoastReport SelectedRoastReport { get; set; }
 
@@ -90,6 +107,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             dataLogger = new DataLogger();
             reportService = new ReportService();
             RoastReport = new RoastReport();
+            ImageService = new ImageService();
             data = new double[MAX_ROAST_TIME];
             timeIntervals = new double[MAX_ROAST_TIME];
 
@@ -107,7 +125,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             SaveReportCommand = new DelegateCommand(SaveReport);
             LoadReportCommand = new DelegateCommand(LoadReport);
             CloseLoadWindowCommand = new DelegateCommand(CloseLoadWindow);
-            DisplayPlotCommand = new DelegateCommand(LoadPlot);
+            DisplayReportDetailsCommand = new DelegateCommand(LoadReportDetails);
+            AddImageCommand = new RelayCommand<int>(SaveImageToReport);
+            FirstCrackCommand = new DelegateCommand(FirstCrack);
 
             messageSubscription = new CompositeDisposable()
             {
@@ -117,14 +137,69 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             InitialisePlot();
         }
 
-        private void LoadPlot()
+        private void FirstCrack()
+        {
+            FirstCrackTimeStampSeconds = $"{plotCounter} s";
+        }
+
+        private void SaveImageToReport(int imageRef)
+        {
+            var ofd = new OpenFileDialog
+            {
+                Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png",
+            };
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                var roastImageId = ImageService.StoreRoastImage(ofd.FileName);
+
+                if (roastImageId == Guid.Empty)
+                    // todo warn user
+                    return;
+
+                switch (imageRef)
+                {
+                    case 1:
+                        RoastReport.PhotoOneId = roastImageId;
+                        ImageOnePreview = new BitmapImage(new Uri(ofd.FileName));
+                        ImageOneIcon = VALID_IMAGE_PREVIEW_ICON;
+                        break;
+
+                    case 2:
+                        RoastReport.PhotoTwoId = roastImageId;
+                        ImageTwoPreview = new BitmapImage(new Uri(ofd.FileName));
+                        ImageTwoIcon = VALID_IMAGE_PREVIEW_ICON;
+                        break;
+
+                    case 3:
+                        RoastReport.PhotoThreeId = roastImageId;
+                        ImageThreePreview = new BitmapImage(new Uri(ofd.FileName));
+                        ImageThreeIcon = VALID_IMAGE_PREVIEW_ICON;
+                        break;
+
+                    case 4:
+                        RoastReport.PhotoFourId = roastImageId;
+                        ImageFourPreview = new BitmapImage(new Uri(ofd.FileName));
+                        ImageFourIcon = VALID_IMAGE_PREVIEW_ICON;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void LoadReportDetails()
         {
             var logData = dataLogger.GetRoastById(SelectedRoastReport.RoastPlotId);
+
             if (logData.Count() == 0 || SelectedRoastReport.RoastPlotId == Guid.Empty)
                 return;
             var temperatureLogData = logData.Select(x => x.Temperature).ToList();
             plotCounter = temperatureLogData.Count;
-
+            RoastProfile = SelectedRoastReport.RoastProfile;
+            roastPoints = RoastProfile.RoastPoints;
+            UpdateRoastPlotPoints();
             for (var i = 0; i < plotCounter; i++)
             {
                 if (i > MAX_ROAST_TIME)
@@ -132,7 +207,70 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
                 data[i] = temperatureLogData[i];
             }
+
+            if (RoastReport.PhotoOneId != Guid.Empty || RoastReport.PhotoOneId != null)
+            {
+                var image = LoadImageFromStream(RoastReport.PhotoOneId);
+                if (image != null)
+                {
+                    ImageOnePreview = image;
+                    ImageOneIcon = VALID_IMAGE_PREVIEW_ICON;
+                }
+            }
+
+            if (RoastReport.PhotoTwoId != Guid.Empty || RoastReport.PhotoOneId != null)
+            {
+                var image = LoadImageFromStream(RoastReport.PhotoTwoId);
+                if (image != null)
+                {
+                    ImageTwoPreview = image;
+                    ImageTwoIcon = VALID_IMAGE_PREVIEW_ICON;
+                }
+            }
+
+            if (RoastReport.PhotoThreeId != Guid.Empty || RoastReport.PhotoOneId != null)
+            {
+                var image = LoadImageFromStream(RoastReport.PhotoThreeId);
+                if (image != null)
+                {
+                    ImageThreePreview = image;
+                    ImageThreeIcon = VALID_IMAGE_PREVIEW_ICON;
+                }
+            }
+
+            if (RoastReport.PhotoFourId != Guid.Empty || RoastReport.PhotoOneId != null)
+            {
+                var image = LoadImageFromStream(RoastReport.PhotoFourId);
+                if (image != null)
+                {
+                    ImageFourPreview = image;
+                    ImageFourIcon = VALID_IMAGE_PREVIEW_ICON;
+                }
+            }
+            InitialisePlot();
             UpdatePlot();
+        }
+
+        private BitmapImage LoadImageFromStream(Guid photoId)
+        {
+            try
+            {
+                using (var stream = ImageService.Load(photoId))
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = stream;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+
+                    return bitmap;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private void CloseLoadWindow()
@@ -149,15 +287,17 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             RoastReports = new ObservableCollection<RoastReport>(reports);
             SelectedRoastReport = RoastReports.FirstOrDefault();
 
+            RoastReport = SelectedRoastReport;
+
             if (SelectedRoastReport != null)
             {
-                LoadPlot();
+                LoadReportDetails();
             }
-            RoastReport = SelectedRoastReport;
         }
 
         private void SaveReport()
         {
+            RoastReport.RoastProfile = RoastProfile;
             RoastReport.RoastPlotId = roastId;
             reportService.SaveReportToDB(RoastReport);
         }
@@ -182,7 +322,6 @@ namespace CoffeeRoasterDesktopUI.ViewModels
                     InitialisePlot();
                 }
             }
-            //var allReports = reportService.GetAllReports();
         }
 
         private void StopRoast()
@@ -219,8 +358,18 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void StartRoast()
         {
+            RoastReport = new RoastReport();
             RoastPlot.plt.Clear();
             roastId = dataLogger.CreateLog();
+            ImageOnePreview = new BitmapImage(new Uri(DEFAULT_IMAGE_PREVIEW_ICON, UriKind.Relative));
+            ImageOneIcon = DEFAULT_IMAGE_ICON;
+            ImageTwoPreview = new BitmapImage(new Uri(DEFAULT_IMAGE_PREVIEW_ICON, UriKind.Relative));
+            ImageTwoIcon = DEFAULT_IMAGE_ICON;
+            ImageThreePreview = new BitmapImage(new Uri(DEFAULT_IMAGE_PREVIEW_ICON, UriKind.Relative));
+            ImageThreeIcon = DEFAULT_IMAGE_ICON;
+            ImageFourPreview = new BitmapImage(new Uri(DEFAULT_IMAGE_PREVIEW_ICON, UriKind.Relative));
+            ImageFourIcon = DEFAULT_IMAGE_ICON;
+
             if (roastId != null)
             {
                 CanStartRoast = true;
@@ -302,10 +451,11 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
             profilePlot = new WpfPlot();
 
-            var bg = ConvertToColor(Styles.PlotStyle.ColormindWhite);
-            var dg = ConvertToColor(Styles.PlotStyle.ColormindOrange);
-            var gg = ConvertToColor(Styles.PlotStyle.ColormindGrey);
-            var tg = ConvertToColor(Styles.PlotStyle.ColormindOrange);
+            var bg = ColourHelper.ConvertToColor(Styles.PlotStyle.ColormindWhite);
+            var dg = ColourHelper.ConvertToColor(Styles.PlotStyle.ColormindOrange);
+            var gg = ColourHelper.ConvertToColor(Styles.PlotStyle.ColormindGrey);
+            var tg = ColourHelper.ConvertToColor(Styles.PlotStyle.ColormindOrange);
+
             profilePlot.plt.PlotScatter(profileXs, profileYs, markerShape: MarkerShape.none, color: System.Drawing.Color.Red, lineWidth: 2);
             profilePlot.plt.Axis(x1: 0, x2: MAX_ROAST_TIME, y1: 0, y2: 240);
 
@@ -344,11 +494,6 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public void Dispose()
         {
             Dispose(true);
-        }
-
-        public System.Drawing.Color ConvertToColor(SolidColorBrush brush)
-        {
-            return System.Drawing.Color.FromArgb(brush.Color.A, brush.Color.R, brush.Color.G, brush.Color.B);
         }
 
         #endregion IDisposable Support

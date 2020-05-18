@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <None Remove="Resources\add new dark theme.png" />
+    <None Remove="Resources\add new.png" />
     <None Remove="Resources\adjust %28dmitri13%29.png" />
     <None Remove="Resources\analysis %28Freepik%29.png" />
     <None Remove="Resources\bean temperature%28Pixel perfect%29.png" />
@@ -44,9 +45,11 @@
     <None Remove="Resources\thermostat %28Freepik%29.png" />
     <None Remove="Resources\upload %28Those Icons%29.png" />
     <None Remove="Resources\upload profile %28Freepik%29.png" />
+    <None Remove="Resources\valid photo %28Good Ware%29.png" />
     <None Remove="Resources\valid profile v2 %28DinosoftLabs%29.png" />
     <None Remove="Resources\verify %28DinosoftLabs%29.png" />
     <None Remove="Resources\verify profile (Freepik).png" />
+    <None Remove="Resources\warning %28Freepik%29.png" />
     <None Remove="Resources\width-add dark theme.png" />
     <None Remove="Resources\width-add.png" />
     <None Remove="Resources\wifi %28Roundicons%29.png" />
@@ -55,6 +58,9 @@
 
   <ItemGroup>
     <Content Include="Resources\add new dark theme.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\add new.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\adjust (dmitri13).png">
@@ -156,6 +162,9 @@
     <Content Include="Resources\upload profile (Freepik).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\valid photo (Good Ware).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\valid profile v2 (DinosoftLabs).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -163,6 +172,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\verify profile %28Freepik%29.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\warning (Freepik).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\width-add.png">
@@ -184,6 +196,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
     <PackageReference Include="ScottPlot" Version="4.0.25" />

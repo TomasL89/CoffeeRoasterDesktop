@@ -2,6 +2,7 @@
 
 namespace CoffeeRoasterDesktopUI.Model
 {
+    // todo maybe cull
     public class RoasterWiFiData : IDataItem
     {
         public DateTime InitialisedTimeStamp { get; private set; }

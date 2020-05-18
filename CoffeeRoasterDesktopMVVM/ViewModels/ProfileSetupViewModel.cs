@@ -1,5 +1,7 @@
 ﻿using CoffeeRoasterDesktopBackgroundLibrary;
 using CoffeeRoasterDesktopBackgroundLibrary.RoastProfile;
+using CoffeeRoasterDesktopUI.Helpers;
+using GalaSoft.MvvmLight.Command;
 using Prism.Commands;
 using ScottPlot;
 using System;
@@ -17,7 +19,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 {
     public class ProfileSetupViewModel : ITabViewModel, INotifyPropertyChanged
     {
+        // todo fix this
         private const int DefaultTimeInSeconds = 900;
+
         private const int DefaultMaxTemperature = 250;
         private const int DefaultMinTemperature = 30;
         private const int DefaultDropDownHeight = 100;
@@ -54,13 +58,20 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             ProfileService = new ProfileService();
             RoastProfilePlot = new WpfPlot();
             RoastProfilePlot.plt.Axis(x1: 0, x2: RoastTimeInSeconds, y1: RoastTemperatureMin, y2: RoastTemperatureMax);
-            RoastProfilePlot.plt.Style(Style.Blue3);
             RoastProfile = new RoastProfile();
             RoastPointItems.Add(new RoastPointButton());
             AddNewRoastPointCommand = new DelegateCommand(AddNewRoastPoint);
             SaveRoastProfileCommand = new DelegateCommand(SaveRoastProfile);
             LoadRoastProfileCommand = new DelegateCommand(LoadRoastProfile);
             ConfigureProfileCommand = new DelegateCommand(ConfigureProfile);
+
+            RoastProfilePlot.plt.Ticks(useExponentialNotation: false, useMultiplierNotation: false);
+            var bg = ColourHelper.ConvertToColor(Styles.PlotStyle.ColormindWhite);
+            var dg = ColourHelper.ConvertToColor(Styles.PlotStyle.ColormindOrange);
+            var gg = ColourHelper.ConvertToColor(Styles.PlotStyle.ColormindGrey);
+            var tg = ColourHelper.ConvertToColor(Styles.PlotStyle.ColormindOrange);
+
+            RoastProfilePlot.plt.Style(null, bg, gg, tg);
 
             // AddPhaseGroupCommand = new DelegateCommand(AddPhaseGroupItem);
             colours.Add(new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bfc693")));
@@ -140,13 +151,14 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             var yS = temperaturePlotPoints.Select(x => x.Item2).ToArray();
 
             RoastProfilePlot.plt.PlotScatter(xS, yS);
-            RoastProfilePlot.plt.Style(Style.Blue3);
+
+            //RoastProfilePlot.plt.Style(Style.Blue3);
             // todo refactor when everything is working
 
             for (var i = 0; i < roastPoints.Count; i++)
             {
                 var roastPoint = roastPoints[i];
-                RoastProfilePlot.plt.PlotText(roastPoint.StageName, roastPoints[i].EndSeconds + 1, roastPoints[i].Temperature + 1, System.Drawing.Color.White, fontName: null, 16);
+                RoastProfilePlot.plt.PlotText(roastPoint.StageName, roastPoints[i].EndSeconds + 1, roastPoints[i].Temperature + 1, System.Drawing.Color.Black, fontName: null, 16);
             }
             try
             {

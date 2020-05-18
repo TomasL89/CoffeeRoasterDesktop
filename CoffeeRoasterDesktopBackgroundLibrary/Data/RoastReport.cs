@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoffeeRoasterDesktopBackgroundLibrary.RoastProfile;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -9,6 +10,7 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.Data
         public Guid Id { get; } = Guid.NewGuid();
         public Guid RoastPlotId { get; set; }
         public string Name { get; set; }
+        public DateTime Date { get; } = DateTime.Now.Date;
         public int BatchNumber { get; set; }
         public string RoastType { get; set; }
         public string BeanVariety { get; set; }
@@ -19,13 +21,14 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.Data
         public int FirstCrackSeconds { get; set; }
         public int RoastTime { get; set; }
         public int BatchWeightRoasted { get; set; }
-        public string PhotoOneFileLocation { get; set; }
-        public string PhotoTwoFileLocation { get; set; }
-        public string PhotoThreeFileLocation { get; set; }
-        public string PhotoFourFileLocation { get; set; }
+        public RoastProfile.RoastProfile RoastProfile { get; set; }
+        public Guid PhotoOneId { get; set; }
+        public Guid PhotoTwoId { get; set; }
+        public Guid PhotoThreeId { get; set; }
+        public Guid PhotoFourId { get; set; }
 
         [StringLength(500, ErrorMessage = "The {0} value cannot exceed {1} characters. ")]
-        public string Notes { get; set; }
+        public string Notes { get; set; } = "Enter notes about roast here";
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
