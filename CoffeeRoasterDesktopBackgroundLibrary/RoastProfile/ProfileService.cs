@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
 
 namespace CoffeeRoasterDesktopBackgroundLibrary.RoastProfile
@@ -73,6 +74,25 @@ namespace CoffeeRoasterDesktopBackgroundLibrary.RoastProfile
                 return null;
 
             return JsonConvert.DeserializeObject<RoastProfile>(message);
+        }
+
+        public RoastProfile RebuildProfile(string profileShell, List<string> profilePoints)
+        {
+            try
+            {
+                var newProfile = JsonConvert.DeserializeObject<RoastProfile>(profileShell);
+
+                foreach (var point in profilePoints)
+                {
+                    var roastPoint = point.Replace(System.Environment.NewLine, string.Empty);
+                    newProfile.RoastPoints.Add(JsonConvert.DeserializeObject<RoastPoint>(roastPoint));
+                }
+                return newProfile;
+            }
+            catch (System.Exception e)
+            {
+                return null;
+            }
         }
     }
 }

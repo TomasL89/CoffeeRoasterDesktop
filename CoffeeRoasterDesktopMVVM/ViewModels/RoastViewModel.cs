@@ -47,6 +47,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         private bool disposedValue = false; // To detect redundant calls
         private Guid roastId;
         private readonly IDisposable messageSubscription;
+        private int firstCrackSeconds;
 
         public string Name { get; } = "Roast";
         public string ImageSource { get; } = "/Resources/flame ( Kirill Kazachek).png";
@@ -72,7 +73,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public bool SaveRoastWindowEnabled { get; private set; } = true;
         public RoastReport RoastReport { get; set; }
         public ImageService ImageService { get; }
-        public string WiFiStrengthPercentage { get; set; }
+        public string WiFiStrength { get; set; }
         public string WiFiLastUpdated { get; private set; }
         public string BeanTemperature { get; private set; }
         public string TemperatureLastUpdated { get; private set; }
@@ -132,14 +133,31 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             messageSubscription = new CompositeDisposable()
             {
                 roasterConnection.MessageRecieved.ObserveOnDispatcher().Do(UpdateData).Subscribe(),
-                roasterConnection.WifiConnectionChanged.ObserveOnDispatcher().Do(UpdateConnectionStatus).Subscribe()
+                roasterConnection.WiFiConnectionChanged.ObserveOnDispatcher().Do(UpdateConnectionStatus).Subscribe(),
+                roasterConnection.ProfileRecieved.ObserveOnDispatcher().Do(UpdateProfile).Subscribe(),
+                roasterConnection.WiFiStrengthUpdated.ObserveOnDispatcher().Do(UpdateWiFiStrength).Subscribe()
             };
+            InitialisePlot();
+        }
+
+        private void UpdateWiFiStrength(string wifiStrength)
+        {
+            WiFiStrength = wifiStrength;
+        }
+
+        private void UpdateProfile(RoastProfile newProfile)
+        {
+            RoastProfile = newProfile;
+            ProfileIsValid = true;
+            roastPoints = RoastProfile.RoastPoints;
+            UpdateRoastPlotPoints();
             InitialisePlot();
         }
 
         private void FirstCrack()
         {
             FirstCrackTimeStampSeconds = $"{plotCounter} s";
+            firstCrackSeconds = plotCounter;
         }
 
         private void SaveImageToReport(int imageRef)
@@ -330,23 +348,17 @@ namespace CoffeeRoasterDesktopUI.ViewModels
             dataLogger.GetRoastById(roastId);
         }
 
-        private void UpdateConnectionStatus(bool obj)
+        private void UpdateConnectionStatus(bool isConnected)
         {
+            if (!isConnected)
+                WiFiStrength = "Disconnected";
+            else if (isConnected && string.IsNullOrWhiteSpace(WiFiStrength))
+                WiFiStrength = "Unknown";
         }
 
         private void GetProfile()
         {
-            var reply = roasterConnection.SendMessageToDeviceWithReply("Profile Get");
-            var profileFromDevice = ProfileService.ValidateRoastProfileAndDecode(reply);
-            ProfileIsValid = true;
-            if (profileFromDevice != null)
-            {
-                RoastProfile = profileFromDevice;
-                ProfileIsValid = true;
-                roastPoints = RoastProfile.RoastPoints;
-                UpdateRoastPlotPoints();
-                InitialisePlot();
-            }
+            roasterConnection.RequestProfileFromDevice();
         }
 
         private void SendProfile()
@@ -432,6 +444,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
                     {
                         RoastPlot.plt.PlotText(rp.StageName, rp.EndSeconds + 1, rp.Temperature + 1, System.Drawing.Color.Black, fontName: null, 16);
                     }
+
+                    if (firstCrackSeconds > 0)
+                        RoastPlot.plt.PlotText($"First Crack {firstCrackSeconds} s", firstCrackSeconds, data[firstCrackSeconds] + 5, System.Drawing.Color.Red, fontName: null, 14);
 
                     RoastPlot.Render();
                 }));

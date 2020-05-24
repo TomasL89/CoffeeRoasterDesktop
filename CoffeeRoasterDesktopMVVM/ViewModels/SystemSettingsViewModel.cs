@@ -24,24 +24,24 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public ICommand ConnectToWifiCommand { get; }
 
         private readonly ConfigurationService configurationService;
-
+        private bool connectedToDevice;
         private readonly IDisposable roasterConnectionSubscription;
         private readonly RoasterConnection roasterConnection;
 
         public SystemSettingsViewModel(RoasterConnection roasterConnection)
         {
-            roasterConnectionSubscription = roasterConnection.WifiConnectionChanged.ObserveOnDispatcher().Subscribe(UpdateConncectionStatus);
+            roasterConnectionSubscription = roasterConnection.WiFiConnectionChanged.ObserveOnDispatcher().Subscribe(UpdateConncectionStatus);
             configurationService = new ConfigurationService();
             GetConfigurationData();
             PropertyChanged += SystemSettingsViewModel_PropertyChanged;
             ConnectToWifiCommand = new DelegateCommand(ConnectoToRoaster);
-            UpdateConncectionStatus(roasterConnection.Connected);
             this.roasterConnection = roasterConnection;
         }
 
         private void UpdateConncectionStatus(bool connected)
         {
             ConnectionStatus = connected ? "Connected" : "Disconnected";
+            connectedToDevice = connected;
         }
 
         private void SystemSettingsViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -54,7 +54,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
             var couldUpdateConfiguration = configurationService.UpdateConfiguration(ipaddress, PortNumber);
 
-            if (couldUpdateConfiguration && !roasterConnection.Connected)
+            if (couldUpdateConfiguration && !connectedToDevice)
                 roasterConnection.ConnectToDevice();
         }
 

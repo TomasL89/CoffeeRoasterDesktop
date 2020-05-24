@@ -32,7 +32,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" HorizontalAlignment="Left" Margin="10" Orientation="Horizontal">
-            <Border Background="White" CornerRadius="10" Width="200" Height="100" Margin="5" >
+            <Border Background="White" CornerRadius="10" Width="200" Height="100" Margin="5">
                 <StackPanel>
                     <TextBlock Text="Profile" FontWeight="Bold" Margin="5" HorizontalAlignment="Right" />
                     <StackPanel Orientation="Horizontal" Margin="15">
@@ -101,7 +101,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/signal (Pixel perfect).png" Width="32" Height="32" />
-                        <TextBlock Text="{Binding WiFiStrengthPercentage}" Margin="120,10,10,0" />
+                        <TextBlock Text="{Binding WiFiStrength}" Margin="100,10,10,0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/refresh (Freepik).png" Width="16" Height="16" />
