@@ -111,13 +111,20 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 
         public void SendMessageToDevice(string message)
         {
-            if (client.TcpClient.Connected)
+            try
             {
-                client.WriteLine(message);
+                if (client.TcpClient.Connected)
+                {
+                    client.WriteLine(message);
+                }
+                else
+                {
+                    wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
+                }
             }
-            else
+            catch (Exception)
             {
-                wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
+                wiFiConnectedSubject.OnNext(false);
             }
         }
 
@@ -160,25 +167,38 @@ namespace CoffeeRoasterDesktopBackgroundLibrary
 
         public void RequestProfileFromDevice()
         {
-            if (client.TcpClient.Connected)
+            try
             {
-                client?.WriteLine("Profile Get");
-                return;
+                if (client.TcpClient.Connected)
+                {
+                    client?.WriteLine("Profile Get");
+                    return;
+                }
             }
-            else
-                wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
+            catch (Exception)
+            {
+                wiFiConnectedSubject.OnNext(false);
+            }
         }
 
         public string SendMessageToDeviceWithReply(string message)
         {
-            if (!client.TcpClient.Connected)
+            try
             {
-                wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
+                if (!client.TcpClient.Connected)
+                {
+                    wiFiConnectedSubject.OnNext(client.TcpClient.Connected);
+                    return null;
+                }
+
+                var result = client?.WriteLineAndGetReply(message, TimeSpan.FromSeconds(10))?.MessageString;
+                return result;
+            }
+            catch (Exception)
+            {
+                wiFiConnectedSubject.OnNext(false);
                 return null;
             }
-
-            var result = client?.WriteLineAndGetReply(message, TimeSpan.FromSeconds(10))?.MessageString;
-            return result;
         }
 
         public void HandleIncomingMessage(string message)

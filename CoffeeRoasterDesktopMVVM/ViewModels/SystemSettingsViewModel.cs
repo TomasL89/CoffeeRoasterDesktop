@@ -2,8 +2,11 @@
 using CoffeeRoasterDesktopBackgroundLibrary;
 using Prism.Commands;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace CoffeeRoasterDesktopUI.ViewModels
@@ -20,7 +23,8 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public string Name { get; set; } = "System Settings";
         public string ImageSource { get; } = "/Resources/interface (Freepik).png";
         public string ConnectionStatus { get; set; } = "Disconnected";
-
+        public List<SettingsItem> SettingsItems { get; private set; } = new List<SettingsItem>();
+        public SettingsItem SelectedSettingsItem { get; set; }
         public ICommand ConnectToWifiCommand { get; }
 
         private readonly ConfigurationService configurationService;
@@ -30,6 +34,30 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         public SystemSettingsViewModel(RoasterConnection roasterConnection)
         {
+            var systemConnectionSetting = new SettingsItem
+            {
+                SettingName = "Connection",
+                SettingIconName = "/Resources/wifi (Roundicons).png"
+            };
+
+            var roastDbSettings = new SettingsItem
+            {
+                SettingName = "Roast Db",
+                SettingIconName = "/Resources/database (Pixel perfect).png"
+            };
+
+            var roastServerSettings = new SettingsItem
+            {
+                SettingName = "Server Settings",
+                SettingIconName = "/Resources/hardware (Payungkead).png"
+            };
+
+            SettingsItems.Add(systemConnectionSetting);
+            SettingsItems.Add(roastDbSettings);
+            SettingsItems.Add(roastServerSettings);
+
+            SelectedSettingsItem = SettingsItems.First();
+
             roasterConnectionSubscription = roasterConnection.WiFiConnectionChanged.ObserveOnDispatcher().Subscribe(UpdateConncectionStatus);
             configurationService = new ConfigurationService();
             GetConfigurationData();

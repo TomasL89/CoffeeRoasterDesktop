@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CoffeeRoasterDesktopUI.Views"
+             xmlns:vm ="clr-namespace:CoffeeRoasterDesktopUI.ViewModels"
              xmlns:styles="clr-namespace:CoffeeRoasterDesktopUI.Styles"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800" MinHeight="1080" MaxWidth="1920" Background="{Binding Source={x:Static styles:PlotStyle.ColormindGrey}}">
@@ -15,13 +16,27 @@
             <ColumnDefinition Width="60" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="60" />
             <RowDefinition Height=".15*" />
             <RowDefinition />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="1" Grid.Column="1">
-            <Label Content="ESP8266 Settings" FontWeight="Bold" />
+        <!--<ComboBox Grid.Row="1" Grid.Column="1" Width="200" Height="50" HorizontalAlignment="Left" ItemsSource="{Binding SettingsItems}" SelectedItem="{Binding SelectedSettingsItem}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:SettingsItem}">
+                    <ComboBoxItem>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2" >
+                            <Image Source="{Binding SettingIconName}" Width="32" Height="32" />
+                            <TextBlock Text="{Binding SettingName}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Margin="20,0,2,0" />
+                        </StackPanel>
+                    </ComboBoxItem>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>-->
+        <StackPanel Grid.Row="2" Grid.Column="1">
+
+            <!--<Label Content="ESP8266 Settings" FontWeight="Bold" />-->
             <StackPanel Orientation="Horizontal">
                 <Label Content="IP Address Of Roaster" FontWeight="Bold" Width="150" />
                 <TextBox Width="30" x:Name="IpOne" Text="{Binding IpOne}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />

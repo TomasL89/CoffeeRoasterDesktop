@@ -60,6 +60,9 @@
                         <Button Width="48" Height="48" BorderThickness="0" Margin="0,0,10,0" Command="{Binding StopRoastCommand}" IsEnabled="{Binding ProfileIsValid}">
                             <Image Source="/Resources/stop (Chanut).png" />
                         </Button>
+                        <Button Width="48" Height="48" BorderThickness="0" Margin="0,0,10,0" Command="{Binding HardwareTestCommand}" IsEnabled="{Binding ProfileIsValid}">
+                            <Image Source="/Resources/examination (Eucalyp).png" />
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -101,7 +104,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/signal (Pixel perfect).png" Width="32" Height="32" />
-                        <TextBlock Text="{Binding WiFiStrength}" Margin="100,10,10,0" />
+                        <TextBlock Text="{Binding WiFiStrength}" Margin="80,10,10,0" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="/Resources/refresh (Freepik).png" Width="16" Height="16" />

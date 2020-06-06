@@ -19,11 +19,14 @@
     <None Remove="Resources\confirm %28Roundicons%29.png" />
     <None Remove="Resources\connect %28Freepik%29.png" />
     <None Remove="Resources\cr_icon__freepik__twv_icon.ico" />
+    <None Remove="Resources\database (Pixel perfect).png" />
     <None Remove="Resources\download %28Pixel Perfect%29.png" />
+    <None Remove="Resources\examination %28Eucalyp%29.png" />
     <None Remove="Resources\first crack.png" />
     <None Remove="Resources\flame %28 Kirill Kazachek%29.png" />
     <None Remove="Resources\folder %28Freepik%29 dark theme.png" />
     <None Remove="Resources\folder %28Freepik%29.png" />
+    <None Remove="Resources\hardware %28Payungkead%29.png" />
     <None Remove="Resources\heater %28Smashicons%29.bmp" />
     <None Remove="Resources\heater %28Smashicons%29.png" />
     <None Remove="Resources\interface %28Freepik%29.png" />
@@ -87,7 +90,13 @@
     <Content Include="Resources\cr_icon__freepik__twv_icon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\database %28Pixel perfect%29.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\download (Pixel Perfect).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\examination (Eucalyp).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\first crack.png">
@@ -100,6 +109,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\folder (Freepik).png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\hardware (Payungkead).png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\heater (Smashicons).png">

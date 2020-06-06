@@ -54,6 +54,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public string ErrorMessage { get; set; }
         public ICommand StartRoastCommand { get; }
         public ICommand StopRoastCommand { get; }
+        public ICommand HardwareTestCommand { get; }
         public ICommand LoadProfileCommand { get; }
         public ICommand SendProfileToRoasterCommand { get; }
         public ICommand VerifyProfileCommand { get; }
@@ -69,7 +70,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
         public int CurrentTemperature { get; private set; }
         public int CurrentTime { get; private set; }
         public bool CanStartRoast { get; private set; }
-        public bool ProfileIsValid { get; private set; }
+        public bool ProfileIsValid { get; private set; } = true;
         public bool SaveRoastWindowEnabled { get; private set; } = true;
         public RoastReport RoastReport { get; set; }
         public ImageService ImageService { get; }
@@ -100,6 +101,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         public RoastViewModel(RoasterConnection roasterConnection)
         {
+            this.PropertyChanged += RoastViewModel_PropertyChanged;
             this.roasterConnection = roasterConnection;
             ProfileService = new ProfileService();
             RoastProfile = new RoastProfile();
@@ -120,6 +122,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
             StartRoastCommand = new DelegateCommand(StartRoast);
             StopRoastCommand = new DelegateCommand(StopRoast);
+            HardwareTestCommand = new DelegateCommand(TestHardware);
             LoadProfileCommand = new DelegateCommand(LoadProfileFromFile);
             SendProfileToRoasterCommand = new DelegateCommand(SendProfile);
             VerifyProfileCommand = new DelegateCommand(GetProfile);
@@ -138,6 +141,21 @@ namespace CoffeeRoasterDesktopUI.ViewModels
                 roasterConnection.WiFiStrengthUpdated.ObserveOnDispatcher().Do(UpdateWiFiStrength).Subscribe()
             };
             InitialisePlot();
+        }
+
+        private void RoastViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SelectedRoastReport))
+            {
+                RoastReport = SelectedRoastReport;
+                LoadReportDetails();
+            }
+        }
+
+        private void TestHardware()
+        {
+            plotCounter = 0;
+            roasterConnection.SendMessageToDevice("Emulate");
         }
 
         private void UpdateWiFiStrength(string wifiStrength)
@@ -209,6 +227,9 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void LoadReportDetails()
         {
+            if (SelectedRoastReport == null)
+                return;
+
             var logData = dataLogger.GetRoastById(SelectedRoastReport.RoastPlotId);
 
             if (logData.Count() == 0 || SelectedRoastReport.RoastPlotId == Guid.Empty)
@@ -358,6 +379,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void GetProfile()
         {
+            // todo fix this later
             roasterConnection.RequestProfileFromDevice();
         }
 
@@ -370,6 +392,7 @@ namespace CoffeeRoasterDesktopUI.ViewModels
 
         private void StartRoast()
         {
+            plotCounter = 0;
             RoastReport = new RoastReport();
             RoastPlot.plt.Clear();
             roastId = dataLogger.CreateLog();
